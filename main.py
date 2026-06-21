@@ -8,6 +8,10 @@ while True:
 
     limpar_tela()
 
+    print("|-----------------------------------------|")
+    print("|------(INDICADORES DA KAPLER WEBER)------|")
+    print("|-----------------------------------------|\n")
+
     print('1 - Desempenho do Imobilizado\n2 - Em desenvolvimento.\n0 - Sair do programa.')
 
     try:
@@ -31,12 +35,12 @@ while True:
 
                 match option:
                     case 1:
-                        cp = float(input('Digite o custo de produção: R$ '))
+                        cp = float(input('\nDigite o custo de produção: R$ '))
                         ail = float(input('Digite o Ativo Imobilizado Líquido: R$ '))
                         
                         p_mob = prod_imobilizado(cp, ail)
                         if p_mob is not None:
-                            print(f'O valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
+                            print(f'\nO valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
                             input('Aperte [ENTER] para continuar...')
                         else:
                             continue
