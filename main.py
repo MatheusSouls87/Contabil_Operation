@@ -1,4 +1,5 @@
 import os #operation system
+from src.desempenho_do_imobilizado import prod_imobilizado
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
