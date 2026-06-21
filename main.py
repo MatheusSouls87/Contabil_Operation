@@ -18,6 +18,7 @@ while True:
         userPut = int(input('Escolha o que deseja operar: '))
     except ValueError:
         input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
+        continue
     
     match userPut:
         case 1:            
