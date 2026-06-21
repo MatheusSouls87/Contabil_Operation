@@ -36,7 +36,7 @@ while True:
                         
                         p_mob = prod_imobilizado(cp, ail)
                         if p_mob is not None:
-                            print(f'O valor da Produção por Imobilizado é: R$ {p_mob}')
+                            print(f'O valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
                             input('Aperte [ENTER] para continuar...')
                         else:
                             continue
