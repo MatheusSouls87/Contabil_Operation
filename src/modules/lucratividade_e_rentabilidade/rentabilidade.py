@@ -7,7 +7,7 @@ def rEquity(lLiquido, pLiquido):
     
     return roe
 
-def EBITDA(lOperacional, depreciacao, amortizacao):
+def eBITDA(lOperacional, depreciacao, amortizacao):
     return lOperacional + depreciacao + amortizacao
 
 def mEBITDA(ebitda, rLiquida):
