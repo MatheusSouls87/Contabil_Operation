@@ -170,8 +170,9 @@ while True:
 
                                 try:
                                     pL = float(input('Informe o Patrimônio Líquido: R$ '))
-                                    pO = float(input('Informe o Passivo Oneroso: R$ '))
-
+                                    divBruta = float(input('Informe o Passivo Oneroso: R$ '))
+                                    caixa = float(input('Informe o valor de Caixa e Equivalente: R$ '))
+                                    pO = divBruta - caixa
                                     roic = returnOiC(nopat, pL, pO)
                                     if roic is not None:
                                         print(f'O valor relativo/percentual do ROIC é: {roic:.2f}')
