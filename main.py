@@ -1,6 +1,6 @@
 import os
 from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
-from src.modules.lucratividade_e_rentabilidade import rEquity, eBITDA, mEBITDA, returnOIC
+from src.modules.lucratividade_e_rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOIC
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -160,14 +160,55 @@ while True:
                             continue
                     
                     case 4:
-                        pass
+                        try:
+                            nopat = float(input('Informe o NOPAT: R$ '))
+                            try:
+                                check = input('Você já possui o valor calculado do Capital Investido (Sim/Não)? ').lower()
+                                if check == "sim":
+                                    try:
+                                        cInvestido = float(input('Informe-o: R$ '))
+                                        eROIC = encurtedROIC(nopat, cInvestido)
+
+                                        if eROIC is not None:
+                                            print(f'O valor relativo/percentual do ROIC é: {eROIC:.2f}%')
+                                            input('Aperte [ENTER] para continuar...')
+                                        else:
+                                            continue
+                                    
+                                    except ValueError:
+                                        input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                                        continue
+                                else:
+                                    try:
+                                        pl = float(input('Informe o Patrimônio Líquido: R$ '))
+                                        po = float(input('Informe o Passivo Oneroso: R$ '))
+
+                                        roic = returnOIC(nopat, pl, po)
+                                        if roic is not None:
+                                            print(f'O valor relativo/percentual do ROIC é: {roic:.2f}')
+                                            input('Aperte [ENTER] para continuar...')
+                                        else:
+                                            continue
+                                        
+                                    except ValueError:
+                                        input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                                        continue
+                            
+                            except ValueError:
+                                input('ERROR! Digite apenas caracteres válidos.\nAperte [ENTER] para continuar...')
+                                continue
+                        
+                        except ValueError:
+                            input('ERROR! Digite apenas caracteres válidos.\nAperte [ENTER] para continuar...')
+                            continue
+
                     case 0:
                         break
                     case _:
                         input('Opção inválida. Aperte [ENTER] para continuar...')
 
-
-
+        case 3:
+            pass
         case 0:
             print('Encerrando o programa...')
             break
