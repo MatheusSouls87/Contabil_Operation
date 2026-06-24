@@ -1,9 +1,6 @@
 def liq_geral(atvCirculante, rLongoPrazo, pCirculante, eLongoPrazo):
-    x = atvCirculante + rLongoPrazo
-    y = pCirculante + eLongoPrazo
-
     try:
-        liq_Geral = x / y
+        liq_Geral = (atvCirculante + rLongoPrazo) / (pCirculante + eLongoPrazo)
     except ZeroDivisionError:
         input('ERRO! Divisão por zero.\nCertifique-se de que o Passivo Circulante e o Exigível a Longo Prazo não sejam zero.')
         return None
