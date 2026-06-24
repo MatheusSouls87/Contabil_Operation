@@ -1,5 +1,4 @@
-import os #operation system
-from src.desempenho_do_imobilizado.producao_por_imobilizado import prod_imobilizado
+import os
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -12,7 +11,7 @@ while True:
     print("|------(INDICADORES DA KEPLER WEBER)------|")
     print("|-----------------------------------------|\n")
 
-    print('1 - Desempenho do Imobilizado\n2 - Em desenvolvimento.\n0 - Sair do programa.')
+    print('1 - Liquidez e Capital de Giro\n2 - Em desenvolvimento.\n0 - Sair do programa.')
 
     try:
         userPut = int(input('Escolha o que deseja operar: '))
@@ -26,7 +25,7 @@ while True:
 
                 limpar_tela()
 
-                print('1 - Produção por Imobilizado.\n2 - Liquidez e Capital de Giro.\n3 - Em desenvolvimento.\n0 - Voltar ao Menu Principal.')
+                print('1 - Liquidez e Capital de Giro.\n2 - Em desenvolvimento.\n3 - Em desenvolvimento\n0 - Voltar ao Menu Principal.')
 
                 try:
                     option = int(input('Escolha o que deseja operar: '))
