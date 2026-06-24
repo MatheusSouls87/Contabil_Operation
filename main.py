@@ -9,7 +9,7 @@ while True:
     limpar_tela()
 
     print("|-----------------------------------------|")
-    print("|------(INDICADORES DA KAPLER WEBER)------|")
+    print("|------(INDICADORES DA KEPLER WEBER)------|")
     print("|-----------------------------------------|\n")
 
     print('1 - Desempenho do Imobilizado\n2 - Em desenvolvimento.\n0 - Sair do programa.')
@@ -26,7 +26,7 @@ while True:
 
                 limpar_tela()
 
-                print('1 - Produção por Imobilizado.\n2 - Em desenvolvimento.\n3 - Em desenvolvimento.\n0 - Voltar ao Menu Principal.')
+                print('1 - Produção por Imobilizado.\n2 - Liquidez e Capital de Giro.\n3 - Em desenvolvimento.\n0 - Voltar ao Menu Principal.')
 
                 try:
                     option = int(input('Escolha o que deseja operar: '))
@@ -36,16 +36,18 @@ while True:
 
                 match option:
                     case 1:
-                        cp = float(input('\nDigite o custo de produção: R$ '))
-                        ail = float(input('Digite o Ativo Imobilizado Líquido: R$ '))
+                        try:
+                            cp = float(input('\nDigite o custo de produção: R$ '))
+                            ail = float(input('Digite o Ativo Imobilizado Líquido: R$ '))
                         
-                        p_mob = prod_imobilizado(cp, ail)
-                        if p_mob is not None:
-                            print(f'\nO valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
-                            input('Aperte [ENTER] para continuar...')
-                        else:
-                            continue
-                
+                            p_mob = prod_imobilizado(cp, ail)
+                            if p_mob is not None:
+                                print(f'\nO valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
+                                input('Aperte [ENTER] para continuar...')
+                            else:
+                                continue
+                        except ValueError:
+                            input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
                     case 2:
                         input('Opção em desenvolvimento. Aperte [ENTER] para continuar...')
                     case 3:
