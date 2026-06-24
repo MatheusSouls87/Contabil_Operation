@@ -1,4 +1,5 @@
 import os
+from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -25,7 +26,7 @@ while True:
 
                 limpar_tela()
 
-                print('1 - Liquidez e Capital de Giro.\n2 - Em desenvolvimento.\n3 - Em desenvolvimento\n0 - Voltar ao Menu Principal.')
+                print('1 - Calcular a Liquidez Geral.\n2 - Calcular a Liquidez Corrente.\n3 - Calcular a Capital Circulante Líquida (CCL)\n0 - Voltar ao Menu Principal.')
 
                 try:
                     option = int(input('Escolha o que deseja operar: '))
@@ -36,12 +37,14 @@ while True:
                 match option:
                     case 1:
                         try:
-                            cp = float(input('\nDigite o custo de produção: R$ '))
-                            ail = float(input('Digite o Ativo Imobilizado Líquido: R$ '))
+                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
+                            rlp = float(input('Informe o Realizável a Longo Prazo: R$ '))
+                            pc = float(input('Informe o Passivo Circulante: R$ '))
+                            elp = float(input('Informe o Exigível a Longo Prazo: R$ '))
                         
-                            p_mob = prod_imobilizado(cp, ail)
-                            if p_mob is not None:
-                                print(f'\nO valor da Produção por Imobilizado é: R$ {p_mob:.2f}')
+                            l_Geral = liq_geral(atvc, rlp, pc, elp)
+                            if l_Geral is not None:
+                                print(f'\nO valor da Liquidez Geral é: R$ {l_Geral:.2f}')
                                 input('Aperte [ENTER] para continuar...')
                             else:
                                 continue
