@@ -48,12 +48,37 @@ while True:
                                 input('Aperte [ENTER] para continuar...')
                             else:
                                 continue
+
                         except ValueError:
                             input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
                     case 2:
-                        input('Opção em desenvolvimento. Aperte [ENTER] para continuar...')
+                        try:
+                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
+                            pc = float(input('Informe o Passivo Circulante: R$ '))
+
+                            l_Corrente = liq_corrente(atvc, pc)
+                            if l_Corrente is not None:
+                                print(f'\nO valor da Liquidez Corrente é: R$ {l_Corrente:.2f}')
+                                input('Aperte [ENTER] para continuar...')
+                            else:
+                                continue
+
+                        except ValueError:
+                            input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
                     case 3:
-                        input('Opção em desenvolvimento. Aperte [ENTER] para continuar...')
+                        try:
+                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
+                            pc = float(input('Informe o Passivo Circulante: R$ '))
+
+                            c_Liquido = ccLiquido(atvc, pc)
+                            if c_Liquido is not None:
+                                print(f'\nO valor da Capital Circulante Líquida é: R$ {c_Liquido:.2f}')
+                                input('Aperte [ENTER] para continuar...')
+                            else:
+                                continue
+                            
+                        except ValueError:
+                            input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
                     case 0:
                         break
                     case _:
