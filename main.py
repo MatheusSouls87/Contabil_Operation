@@ -1,6 +1,6 @@
 import os
 from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
-from src.modules.lucratividade_e_rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOIC
+from src.modules.lucratividade_e_rentabilidade.rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOiC
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -15,7 +15,7 @@ while True:
     print("|------(INDICADORES DA KEPLER WEBER)------|")
     print("|-----------------------------------------|\n")
 
-    print('1 - Liquidez e Capital de Giro\n2 - Em desenvolvimento.\n0 - Sair do programa.')
+    print('1 - Liquidez e Capital de Giro\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento\n0 - Sair do programa.')
 
     try:
         userPut = int(input('Escolha o que deseja operar: '))
@@ -91,10 +91,7 @@ while True:
 
                 limpar_tela()
 
-                print("""1 - Calcular o Retorno Sobre o Patrimonio Líquido (ROE).
-                      2 - Calcular os Lucros Antes de Juros, Impostos, Depreciação e Amortização (EBITDA).
-                      3 - Calcular a Margem de EBITDA.
-                      4 - Calcular o Retorno Sobre o Capital Investido (ROIC).\n""")
+                print("1 - Calcular o Retorno Sobre o Patrimonio Líquido (ROE).\n2 - Calcular os Lucros Antes de Juros, Impostos, Depreciação e Amortização (EBITDA).\n3 - Calcular a Margem de EBITDA.\n4 - Calcular o Retorno Sobre o Capital Investido (ROIC).\n0 - Voltar ao Menu Principal")
                 
                 try:
                     option1 = int(input('Escolha o que deseja operar: '))
@@ -134,7 +131,10 @@ while True:
                             ebitda_atual = 0
                             confirmation = input(f'Deseja utilizar o EBITDA R$ {ebitda_calculado:.2f} calculado anteriormente (Sim/Não)? ').lower()
 
-                            if confirmation == "sim":
+                            if ((confirmation != "sim") and (confirmation != "não")):
+                                input('Digite apenas Caracteres válidos.\nAperte [ENTER] para continuar...')
+                                continue
+                            elif confirmation == "sim":
                                 ebitda_atual = ebitda_calculado
                             else:
                                 try:
@@ -161,10 +161,69 @@ while True:
                     
                     case 4:
                         try:
-                            nopat = float(input('Informe o NOPAT: R$ '))
+                            check = input('Você já possui o NOPAT calculado (Sim/Não)? ').lower()
+                            if ((check != "sim") and (check != "não")):
+                                input('Caractere inválido. Digite o que se pede.\nAperte [ENTER] para continuar...')
+                                continue
+                            elif check == "sim":
+                                nopat = float(input('Informe o NOPAT: R$ '))
+
+                                try:
+                                    pL = float(input('Informe o Patrimônio Líquido: R$ '))
+                                    pO = float(input('Informe o Passivo Oneroso: R$ '))
+
+                                    roic = returnOiC(nopat, pL, pO)
+                                    if roic is not None:
+                                        print(f'O valor relativo/percentual do ROIC é: {roic:.2f}')
+                                        input('Aperte [ENTER] para continuar...')
+                                    else:
+                                        continue
+
+                                except ValueError:
+                                    input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                                    continue
+                            else:
+                                try:
+                                    ebitN = float(input('Informe o valor do EBIT: R$ '))
+                                    isl = float(input('Informe os Impostos Sobre o Lucro: R$ '))
+                                    cNOPAT = ebitN - isl
+
+                                    try:
+                                        check1 = input('Você já possui o valor calculado do Capital Investido (Sim/Não)? ').lower()
+                                        if ((check1 != "sim") and (check1 != "não")):
+                                            input('Digite apenas Caracteres válidos.\nAperte [ENTER] para continuar...')
+                                            continue
+                                        elif check1 == "sim":
+                                            try:
+                                                cINVESTIDO = float(input('Informe-o: R$ '))
+                                                enROIC = encurtedROIC(cNOPAT, cINVESTIDO)
+
+                                                if enROIC is not None:
+                                                    print(f'O valor relativo/percentual do ROIC é: {enROIC:.2f}%')
+                                                    input('Aperte [ENTER] para continuar...')
+                                                else:
+                                                    continue
+                                            
+                                            except ValueError:
+                                                input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                                                continue
+                                        else:
+                                            pass
+                                    
+                                    except ValueError:
+                                        input('ERROR! Digite apenas caracteres válidos.\nAperte [ENTER] para continuar...')
+                                        continue
+                                
+                                except ValueError:
+                                    input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                                    continue
+
                             try:
-                                check = input('Você já possui o valor calculado do Capital Investido (Sim/Não)? ').lower()
-                                if check == "sim":
+                                check2 = input('Você já possui o valor calculado do Capital Investido (Sim/Não)? ').lower()
+                                if ((check2 != "sim") and (check2 != "não")):
+                                    input('Digite apenas Caracteres válidos.\nAperte [ENTER] para continuar...')
+                                    continue
+                                elif check2 == "sim":
                                     try:
                                         cInvestido = float(input('Informe-o: R$ '))
                                         eROIC = encurtedROIC(nopat, cInvestido)
@@ -183,13 +242,13 @@ while True:
                                         pl = float(input('Informe o Patrimônio Líquido: R$ '))
                                         po = float(input('Informe o Passivo Oneroso: R$ '))
 
-                                        roic = returnOIC(nopat, pl, po)
+                                        roic = returnOiC(nopat, pl, po)
                                         if roic is not None:
                                             print(f'O valor relativo/percentual do ROIC é: {roic:.2f}')
                                             input('Aperte [ENTER] para continuar...')
                                         else:
                                             continue
-                                        
+
                                     except ValueError:
                                         input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
                                         continue
