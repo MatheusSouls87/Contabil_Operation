@@ -81,6 +81,7 @@ while True:
                             l_Corrente = liq_corrente(atvc, pc)
                             if l_Corrente is not None:
                                 print(f'\nO valor da Liquidez Corrente é: R$ {l_Corrente:.2f}')
+                                ask_save("Liquidez e Capital de Giro", "Liquidez Corrente", liq_corrente)
                             else:
                                 print('\nERRO! Divisão por zero. O Passivo Circulante não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -94,6 +95,7 @@ while True:
 
                             c_Liquido = ccLiquido(atvc, pc)
                             print(f'\nO valor da Capital Circulante Líquida é: R$ {c_Liquido:.2f}')
+                            ask_save("Liquidez e Capital de Giro", "Capital Circulante Líquido (CCL)", c_Liquido)
                             input('Aperte [ENTER] para continuar...')
                         except ValueError:
                             input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
@@ -123,6 +125,7 @@ while True:
                             r_Equity = rEquity(ll, pl)
                             if r_Equity is not None:
                                 print(f'\nO valor do ROE é: {r_Equity:.2f}%')
+                                ask_save("Lucratividade e Rentabilidade", "Return of Equity (ROE)", r_Equity)
                             else:
                                 print('\nERRO! Divisão por zero. O Patrimônio Líquido não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -137,6 +140,7 @@ while True:
 
                             ebitda_calculado = eBITDA(l_Operacional, dp, am)
                             print(f'\nO valor do EBITDA é: R$ {ebitda_calculado:.2f}')
+                            ask_save("Lucratividade e Rentabilidade", "Lucro antes de Juros, Impostos, Depreciação e Amortização (EBITDA)", ebitda_calculado)
                             input('Aperte [ENTER] para continuar...')
                         except ValueError:
                             input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
@@ -162,6 +166,7 @@ while True:
 
                             if margem_EBITDA is not None:
                                 print(f'A Margem EBITDA calculada é: {margem_EBITDA:.2f}%')
+                                ask_save("Lucratividade e Rentabilidade", "Margem EBITDA", margem_EBITDA)
                             else:
                                 print('\nERRO! A Receita Líquida não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -202,6 +207,7 @@ while True:
 
                             if roic_result is not None:
                                 print(f'O valor relativo/percentual do ROIC é: {roic_result:.2f}%')
+                                ask_save("Lucratividade e Rentabilidade", "Retorno Sobre o Capítal Investido (ROIC)", roic_result)
                             else:
                                 print('\nERRO! Divisão por zero no cálculo do ROIC.')
                             input('Aperte [ENTER] para continuar...')
@@ -234,6 +240,7 @@ while True:
                             r_CTCP = relacaoCTCP(ct, cp)
                             if r_CTCP is not None:
                                 print(f'O valor relativo/percentual da Relação CT/CP é de {r_CTCP:.2f}%.')
+                                ask_save("Estrutura e Endividamento", "Relação CT/CP", r_CTCP)
                             else:
                                 print('\nERRO! O Capital Próprio não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -248,6 +255,7 @@ while True:
                             composicao_Endividamento = comp_ENDIVIDAMENTO(pc, pnc)
                             if composicao_Endividamento is not None:
                                 print(f'O valor relativo/percentual da Composição do Endividamento é {composicao_Endividamento:.2f}%.')
+                                ask_save("Estrutura e Endividamento", "Composição do Endividamento", composicao_Endividamento)
                             else:
                                 print('\nERRO! O Passivo Total não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -292,6 +300,18 @@ while True:
 
                                     limpar_tela()
                                     print(conteudo)
+                                    
+                                    define = input('Deseja definir este relatório como o ativo no momento (s/n)? ').strip().lower()
+                                    if define not in ['s', 'sim', 'n', 'nao', 'não']:
+                                        input('Opção inválida. Aperte [ENTER] para continuar...')
+                                        continue
+
+                                    if define in ['s', 'sim']:
+                                        relatorio_ativo = archive_choose
+                                        print(f"Relatório '{relatorio_ativo}' definido como ativo.")
+                                    else:
+                                        pass
+
                                     input('\nFim do relatório. Aperte [ENTER] para continuar...')
                                 elif choose != 0:
                                     input('Número inválido. Aperte [ENTER] para continuar...')
