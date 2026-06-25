@@ -30,7 +30,7 @@ def encurtedROIC(nOPAT, cInvestido):
 
 def returnOiC(nOPAT, pLiquido, pOneroso):
     try:
-        roic = (nOPAT / pLiquido + pOneroso) * 100
+        roic = (nOPAT / (pLiquido + pOneroso)) * 100
     except ZeroDivisionError:
         input('ERRO! Divisão por zero.\nCertifique-se de que a Receita Líquida ou o Patrimônio Oneroso não sejam zero.')
         return None

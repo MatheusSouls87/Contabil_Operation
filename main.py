@@ -1,6 +1,7 @@
 import os
 from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
 from src.modules.lucratividade_e_rentabilidade.rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOiC
+from src.modules.estrutura_e_endividamento.endividamento import relacaoCTCP, comp_ENDIVIDAMENTO
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -268,7 +269,49 @@ while True:
                         input('Opção inválida. Aperte [ENTER] para continuar...')
 
         case 3:
-            pass
+            while True:
+                limpar_tela()
+
+                print('1 - Calcular a Relação CT/CP (Endividamento).\n2 - Calcular a Composição do Endividamento.\n0 - Voltar ao Menu Principal.')
+
+                try:
+                    userOption = int(input('Escolha o que deseja operar: '))
+                except ValueError:
+                    input('ERROR! Opção digite um número.\nAperte [ENTER] para continuar...')
+                
+                match userOption:
+                    case 1:
+                        try:
+                            ct = float(input('Digite o Capital de Terceiros (Passivo Total): R$ '))
+                            cp = float(input('Digite o Capital Próprio (Patrimônio Líquido): R$ '))
+
+                            r_CTCP = relacaoCTCP(ct, cp)
+                            if r_CTCP is not None:
+                                print(f'O valor relativo/percentual da Relação CT/CP é de {r_CTCP:.2f}%.')
+                                input('Aperte [ENTER] para continuar...')
+                            else:
+                                continue
+                        except ValueError:
+                            input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                            continue
+                    case 2:
+                        try:
+                            pc = float(input('Digite o Passivo Circulante: R$ '))
+                            pnc = float(input('Digite o Passivo Não Circulante: R$ '))
+
+                            composicao_Endividamento = comp_ENDIVIDAMENTO(pc, pnc)
+                            if composicao_Endividamento is not None:
+                                print(f'O valor relativo/percentual da Composição do Endividamento é {composicao_Endividamento:.2f}%.')
+                                input('Aperte [ENTER] para continuar...')
+                            else:
+                                continue
+                        except ValueError:
+                            input('ERROR! Digite apenas números com um "." para casas decimais.\nAperte [ENTER] para continuar...')
+                            continue
+                    case 0:
+                        break
+                    case _:
+                        input('Opção inválida! Aperte [ENTER] para continuar...')
         case 0:
             print('Encerrando o programa...')
             break
