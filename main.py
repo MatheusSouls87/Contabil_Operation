@@ -3,6 +3,7 @@ from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corre
 from src.modules.lucratividade_e_rentabilidade.rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOiC
 from src.modules.estrutura_e_endividamento.endividamento import relacaoCTCP, comp_ENDIVIDAMENTO
 from src.modules.arquivos import gerenciador
+from src.modules import graficos
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -333,6 +334,31 @@ while True:
                         else:
                             print(f"\n[X] Já existe um relatório com esse nome '{new_name}'.")
                         
+                        input('\nAperte [ENTER] para continuar...')
+                    case 0:
+                        break
+                    case _:
+                        input('Opção inválida. Aperte [ENTER] para continuar...')
+        case 5:
+            while True:
+                limpar_tela()
+                print('===== GERAÇÃO DE GRÁFICOS =====\n')
+                print('1 - Gerar Gráficos de Valores Absolutos (R$).\n2 - Gerar Gráficos de Valores Percentuais (%).\n0 - Retornar ao Menu Principal.')
+
+                try:
+                    opc = int(input('\nEscolha uma operação: '))
+                except ValueError:
+                    input('ERRO! Digite um número. Aperte [ENTER] para continuar...')
+                    continue
+
+                match opc:
+                    case 1:
+                        indicador, anos, valores = graficos.coletar_dados_usuario('absoluto')
+                        graficos.gerar_grafico(indicador, anos, valores, 'absoluto')
+                        input('\nAperte [ENTER] para continuar...')
+                    case 2:
+                        indicador, anos, valores = graficos.coletar_dados_usuario('percentual')
+                        graficos.gerar_grafico(indicador, anos, valores, 'percentual')
                         input('\nAperte [ENTER] para continuar...')
                     case 0:
                         break
