@@ -9,7 +9,7 @@ def existing_paste():
         os.makedirs(saving_paste)
 
 def get_full_path(archive_name):
-    if not archive_name.endswitch(extension):
+    if not archive_name.endswith(extension):
         archive_name += extension
     return os.path.join(saving_paste, archive_name)
 
@@ -37,7 +37,7 @@ def add_indicator(archive_name, category, indicator, value, nota=""):
     if not os.path.exists(pathway):
         return False
     
-    date_curr = datetime().now().strftime("%d/%m/%Y %H:%M")
+    date_curr = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     str_value = f"{value:.2f}" if value is not None else "ERRO/INVÁLIDO"
 
@@ -49,7 +49,7 @@ def add_indicator(archive_name, category, indicator, value, nota=""):
 def list_files():
     existing_paste()
 
-    archive = [arq for arq in os.listdir(saving_paste) if arq.endswitch(extension)]
+    archive = [arq for arq in os.listdir(saving_paste) if arq.endswith(extension)]
 
     return archive
 

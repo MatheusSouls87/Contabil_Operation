@@ -2,11 +2,30 @@ import os
 from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
 from src.modules.lucratividade_e_rentabilidade.rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOiC
 from src.modules.estrutura_e_endividamento.endividamento import relacaoCTCP, comp_ENDIVIDAMENTO
+from src.modules.arquivos import gerenciador
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 ebitda_calculado = None
+relatorio_ativo = None
+
+def ask_save(category, indicator, value):
+    global relatorio_ativo
+
+    if relatorio_ativo is None:
+        print("\n[AVISO] Nenhum relatório ativo no momento. O valor não será guardado no histórico.")
+        return
+    
+    response = input(f"Deseja anexar este resultado ao relatório '{relatorio_ativo}' (s/n)? ").strip().lower()
+    if response in ['s', 'sim']:
+        note = input('Deseja adicionar alguma nota ou observação (deixe em branco se não quiser)? ')
+        sucess = gerenciador.add_indicator(relatorio_ativo, category, indicator, value, note)
+
+        if sucess:
+            print('[✓] Indicador anexado com sucesso!')
+        else:
+            print('[X] Erro ao anexar. O relatório pode ter sido apagado ou movido.')
 
 while True:
     limpar_tela()
@@ -15,7 +34,7 @@ while True:
     print("|------(INDICADORES DA KEPLER WEBER)------|")
     print("|-----------------------------------------|\n")
 
-    print('1 - Liquidez e Capital de Giro\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento\n0 - Sair do programa.')
+    print('1 - Liquidez e Capital de Giro\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento\n4 - Gerenciador de Relatórios\n0 - Sair do programa.')
 
     try:
         userPut = int(input('Escolha o que deseja operar: '))
@@ -46,6 +65,8 @@ while True:
                             l_Geral = liq_geral(atvc, rlp, pc, elp)
                             if l_Geral is not None:
                                 print(f'\nO valor da Liquidez Geral é: R$ {l_Geral:.2f}')
+
+                                ask_save("Liquidez e Capital de Giro", "Liquidez Geral", l_Geral)
                             else:
                                 print('\nERRO! Divisão por zero. O Passivo e Exigível não podem ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -238,6 +259,66 @@ while True:
                     case _:
                         input('Opção inválida! Aperte [ENTER] para continuar...')
         
+        case 4:
+            while True:
+                limpar_tela()
+                print('--- GERENCIADOR DE RELATÓRIOS ---')
+                print('1 - Listar e Ler Relatórios Salvos.\n2 - Criar Novo Relatório (Em Breve).\n0 - Voltar ao Menu Principal.')
+
+                try:
+                    op_archive = int(input('\nEscolha a operação: '))
+                except ValueError:
+                    input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
+                    continue
+
+                match op_archive:
+                    case 1:
+                        saved_files = gerenciador.list_files()
+
+                        if len(saved_files) == 0:
+                            print('\nNenhum relatório encontrado no sistema.')
+                            input('Aperte [ENTER] para continuar...')
+                        else:
+                            print('\nRelatórios Disponíveis:')
+                            for i, arq in enumerate(saved_files):
+                                clean_name = arq.replace(gerenciador.extension, "")
+                                print(f'[{i+1}] - {clean_name}')
+                            
+                            try:
+                                choose = int(input('\nDigite o número do relatório que deseja abrir (0 para cancelar): '))
+                                if choose > 0 and choose <= len(saved_files):
+                                    archive_choose = saved_files[choose - 1]
+                                    conteudo = gerenciador.read_files(archive_choose)
+
+                                    limpar_tela()
+                                    print(conteudo)
+                                    input('\nFim do relatório. Aperte [ENTER] para continuar...')
+                                elif choose != 0:
+                                    input('Número inválido. Aperte [ENTER] para continuar...')
+                            except ValueError:
+                                input('ERRO! Digite apenas o número correspondente.\nAperte [ENTER] para continuar...')
+                    
+                    case 2:
+                        limpar_tela()
+                        print("--- CRIAR NOVO RELATÓRIO ---")
+                        new_name = input('Digite o nome do projeto/relatório (ex: kepler_2025): ').strip()
+                        describe = input('Digite uma breve descrição para este relatório: ').strip()
+
+                        sucess = gerenciador.create_new_archive(new_name, describe)
+
+                        if sucess:
+                            relatorio_ativo = new_name
+                            print(f"\n[✓] Relatório '{new_name}{gerenciador.extension}' criado com sucesso!")
+                            print("Este relatório está agora ATIVO. Todos os novos cálculos podem ser guardados nele.")
+                        else:
+                            print(f"\n[X] Já existe um relatório com esse nome '{new_name}'.")
+                        
+                        input('\nAperte [ENTER] para continuar...')
+                    case 0:
+                        break
+                    case _:
+                        input('Opção inválida. Aperte [ENTER] para continuar...')
+
         case 0:
             print('Encerrando o programa...')
             break
