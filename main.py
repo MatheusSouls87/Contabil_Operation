@@ -81,7 +81,7 @@ while True:
                             l_Corrente = liq_corrente(atvc, pc)
                             if l_Corrente is not None:
                                 print(f'\nO valor da Liquidez Corrente é: R$ {l_Corrente:.2f}')
-                                ask_save("Liquidez e Capital de Giro", "Liquidez Corrente", liq_corrente)
+                                ask_save("Liquidez e Capital de Giro", "Liquidez Corrente", l_Corrente)
                             else:
                                 print('\nERRO! Divisão por zero. O Passivo Circulante não pode ser zero.')
                             input('Aperte [ENTER] para continuar...')
@@ -307,7 +307,7 @@ while True:
                                         continue
 
                                     if define in ['s', 'sim']:
-                                        relatorio_ativo = archive_choose
+                                        relatorio_ativo = archive_choose.replace(gerenciador.extension, "")
                                         print(f"Relatório '{relatorio_ativo}' definido como ativo.")
                                     else:
                                         pass
