@@ -35,7 +35,7 @@ while True:
     print("|------(INDICADORES DA KEPLER WEBER)------|")
     print("|-----------------------------------------|\n")
 
-    print('1 - Liquidez e Capital de Giro\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento\n4 - Gerenciador de Relatórios\n0 - Sair do programa.')
+    print('1 - Liquidez e Capital de Giro.\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento.\n4 - Gerenciador de Relatórios.\n5 - Gerar Gráficos.\n0 - Sair do programa.')
 
     try:
         userPut = int(input('Escolha o que deseja operar: '))
@@ -272,7 +272,7 @@ while True:
             while True:
                 limpar_tela()
                 print('--- GERENCIADOR DE RELATÓRIOS ---')
-                print('1 - Listar e Ler Relatórios Salvos.\n2 - Criar Novo Relatório (Em Breve).\n0 - Voltar ao Menu Principal.')
+                print('1 - Listar e Ler Relatórios Salvos.\n2 - Criar Novo Relatório.\n0 - Voltar ao Menu Principal.')
 
                 try:
                     op_archive = int(input('\nEscolha a operação: '))
@@ -359,6 +359,26 @@ while True:
                     case 2:
                         indicador, anos, valores = graficos.coletar_dados_usuario('percentual')
                         graficos.gerar_grafico(indicador, anos, valores, 'percentual')
+                        input('\nAperte [ENTER] para continuar...')
+                    case 3:
+                        print("\n--- Gráfico Comparativo (Múltiplas Linhas) ---")
+                        print("1 - Valores Absolutos (R$)")
+                        print("2 - Valores Percentuais (%)")
+                        
+                        while True:
+                            escolha_tipo = input("Escolha o tipo de gráfico (1 ou 2): ").strip()
+                            if escolha_tipo == '1':
+                                tipo_multiplo = 'absoluto'
+                                break
+                            elif escolha_tipo == '2':
+                                tipo_multiplo = 'percentual'
+                                break
+                            else:
+                                print("Opção inválida! Por favor, digite 1 ou 2.")
+                        
+                        anos, dados = graficos.coletar_dados_multiplos(tipo_multiplo, qtd_indicadores=3)
+                        graficos.gerar_grafico_multiplo(anos, dados, tipo_multiplo)
+                        
                         input('\nAperte [ENTER] para continuar...')
                     case 0:
                         break
