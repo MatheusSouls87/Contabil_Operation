@@ -43,6 +43,39 @@ class ContabilApp(QMainWindow):
 
         self.principal_layout.addWidget(self.archive_group)
 
+        self.operations_group = QGroupBox("Análises e Operações")
+        self.operations_layout = QHBoxLayout()
+
+        self.btn_liquidez = QPushButton("Liquidez e Cap. de Giro")
+        self.btn_endividamento = QPushButton("Endividamento")
+        self.btn_rentabilidade = QPushButton("Rentabilidade")
+        self.btn_graficos = QPushButton("Gerar Gráficos")
+
+        self.operations_layout.addWidget(self.btn_liquidez)
+        self.operations_layout.addWidget(self.btn_endividamento)
+        self.operations_layout.addWidget(self.btn_rentabilidade)
+        self.operations_layout.addWidget(self.btn_graficos)
+
+        self.operations_group.setLayout(self.operations_layout)
+        self.principal_layout.addWidget(self.operations_group)
+
+        self.log_group = QGroupBox("Terminal de Resultados")
+        self.log_layout = QVBoxLayout()
+
+        self.txt_log = QTextEdit()
+        self.txt_log.setReadOnly(True)
+
+        self.txt_log.setStyleSheet("background-color: #1e1e1e; color: #00ff00; font-family: Consolas; font-size: 14px;")
+        
+        self.btn_clear = QPushButton("Limpar Terminal")
+        self.btn_clear.clicked.connect(self.txt_log.clear)
+
+        self.log_layout.addWidget(self.txt_log)
+        self.log_layout.addWidget(self.btn_clear)
+
+        self.log_group.setLayout(self.log_layout)
+        self.principal_layout.addWidget(self.log_group)
+
         self.principal_layout.addStretch()
 
     def search_file(self):
