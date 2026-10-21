@@ -109,46 +109,136 @@ class ContabilApp(QMainWindow):
         self.txt_log.append("Dados carregados com sucesso!\nO sistema está pronto para executar as análises.\n")
 
     def calc_liquidez(self):
+        # Opcional: Se quiser que o utilizador carregue o ficheiro de relatório primeiro, mantenha este if. 
+        # Caso contrário, pode apagá-lo para calcular mesmo sem um ficheiro selecionado.
         if not self.loaded_data:
-            self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+            self.txt_log.append("⚠️ AVISO: Selecione um ficheiro de relatório primeiro!\n")
             return
         
-        self.txt_log.append("Analisando Liquidez e Capital de Giro...")
+        atvc, ok1 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Ativo Circulante (R$):", 0, 0, 1000000000, 2)
+        if not ok1: return
 
+        pc, ok2 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Passivo Circulante (R$):", 0, 0, 1000000000, 2)
+        if not ok2: return
 
-        #simulação
-        self.txt_log.append("Liquidez Corrente: x")
-        self.txt_log.append("Capital de Giro: y\n")
+        rlp, ok3 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Realizável a Longo Prazo (R$):", 0, 0, 1000000000, 2)
+        if not ok3: return
+
+        elp, ok4 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Exigível a Longo Prazo (R$):", 0, 0, 1000000000, 2)
+        if not ok4: return
+
+        self.txt_log.append("--- RESULTADOS DA LIQUIDEZ E CAPITAL DE GIRO ---")
+        
+        resultado_corrente = liq_corrente(atvc, pc)
+        resultado_geral = liq_geral(atvc, rlp, pc, elp)
+        resultado_ccl = ccLiquido(atvc, pc)
+
+        if resultado_corrente is not None:
+            self.txt_log.append(f"Liquidez Corrente: {resultado_corrente:.2f}")
+        else:
+            self.txt_log.append("Erro: O Passivo Circulante não pode ser zero.")
+
+        if resultado_geral is not None:
+            self.txt_log.append(f"Liquidez Geral: {resultado_geral:.2f}")
+
+        self.txt_log.append(f"Capital Circulante Líquido: R$ {resultado_ccl:.2f}\n")
     
     def calc_endividamento(self):
         if not self.loaded_data:
-            self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+            self.txt_log.append("AVISO: Selecione um ficheiro primeiro!\n")
             return
-            
-        self.txt_log.append("Analisando a Estrutura e Endividamento...")
-    
-    
-        #simulação
-        self.txt_log.append("Estrutura e Endividamento: x\n")
+
+        ct, ok1 = QInputDialog.getDouble(self, "Endividamento", "Capital de Terceiros (Passivo Total):", 0, 0, 1e9, 2)
+        if not ok1: return
+        
+        cp, ok2 = QInputDialog.getDouble(self, "Endividamento", "Capital Próprio (Patrimônio Líquido):", 0, 0, 1e9, 2)
+        if not ok2: return
+        
+        pc, ok3 = QInputDialog.getDouble(self, "Endividamento", "Passivo Circulante:", 0, 0, 1e9, 2)
+        if not ok3: return
+        
+        pnc, ok4 = QInputDialog.getDouble(self, "Endividamento", "Passivo Não Circulante:", 0, 0, 1e9, 2)
+        if not ok4: return
+
+        self.txt_log.append("--- RESULTADOS DE ESTRUTURA E ENDIVIDAMENTO ---")
+        
+        r_ctcp = relacaoCTCP(ct, cp)
+        if r_ctcp is not None:
+            self.txt_log.append(f"Relação CT/CP: {r_ctcp:.2f}%")
+        else:
+            self.txt_log.append("Erro: Capital Próprio não pode ser zero.")
+
+        comp_end = comp_ENDIVIDAMENTO(pc, pnc)
+        if comp_end is not None:
+            self.txt_log.append(f"Composição do Endividamento: {comp_end:.2f}%\n")
+        else:
+            self.txt_log.append("Erro: Passivo Total não pode ser zero.\n")
 
     def calc_rentabilidade(self):
         if not self.loaded_data:
-                self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
-                return
-            
-        self.txt_log.append("Analisando a Rentabilidade...")
-    
-        #simulação
-        self.txt_log.append("Rentabilidade: x\n")
+            self.txt_log.append("AVISO: Selecione um ficheiro primeiro!\n")
+            return
+
+        ll, ok1 = QInputDialog.getDouble(self, "Rentabilidade", "Lucro Líquido:", 0, -1e9, 1e9, 2)
+        if not ok1: return
+        
+        pl, ok2 = QInputDialog.getDouble(self, "Rentabilidade", "Patrimônio Líquido:", 0, -1e9, 1e9, 2)
+        if not ok2: return
+        
+        lop, ok3 = QInputDialog.getDouble(self, "Rentabilidade", "Lucro Operacional:", 0, -1e9, 1e9, 2)
+        if not ok3: return
+        
+        dep, ok4 = QInputDialog.getDouble(self, "Rentabilidade", "Depreciação:", 0, 0, 1e9, 2)
+        if not ok4: return
+        
+        amo, ok5 = QInputDialog.getDouble(self, "Rentabilidade", "Amortização:", 0, 0, 1e9, 2)
+        if not ok5: return
+        
+        rl, ok6 = QInputDialog.getDouble(self, "Rentabilidade", "Receita Líquida:", 0, 0, 1e9, 2)
+        if not ok6: return
+
+        self.txt_log.append("--- RESULTADOS DE LUCRATIVIDADE E RENTABILIDADE ---")
+
+        roe = rEquity(ll, pl)
+        if roe is not None:
+            self.txt_log.append(f"ROE: {roe:.2f}%")
+
+        ebitda_val = eBITDA(lop, dep, amo)
+        self.txt_log.append(f"EBITDA: R$ {ebitda_val:.2f}")
+
+        m_ebitda = mEBITDA(ebitda_val, rl)
+        if m_ebitda is not None:
+            self.txt_log.append(f"Margem EBITDA: {m_ebitda:.2f}%\n")
 
     def show_graphics(self):
         if not self.loaded_data:
-            self.txt_log.append("AVISO: Carregue os dados primeiro antes de gerar gráficos!\n")
+            self.txt_log.append("AVISO: Selecione um ficheiro primeiro!\n")
             return
-        
-        self.txt_log.append("Gerando gráficos...\n")
-        #simulação
-        self.txt_log.append("Gráficos gerados com sucesso!\n")
+
+        indicador, ok1 = QInputDialog.getText(self, "Gráficos", "Nome do Indicador (ex: ROE):")
+        if not ok1 or not indicador: return
+
+        anos_str, ok2 = QInputDialog.getText(self, "Gráficos", "Anos separados por vírgula (ex: 2021, 2022, 2023):")
+        if not ok2 or not anos_str: return
+
+        valores_str, ok3 = QInputDialog.getText(self, "Gráficos", "Valores separados por vírgula (ex: 10.5, 12.0, 15.3):")
+        if not ok3 or not valores_str: return
+
+        try:
+            anos = [ano.strip() for ano in anos_str.split(',')]
+            valores = [float(v.strip().replace(',', '.')) for v in valores_str.split(',')]
+
+            if len(anos) != len(valores):
+                self.txt_log.append("Erro: A quantidade de anos e valores deve ser igual.\n")
+                return
+
+            gerar_grafico(indicador, anos, valores, 'absoluto')
+            
+            nome_arquivo = f"grafico_{indicador.replace(' ', '_').lower()}.png"
+            self.txt_log.append(f"Gráfico gerado com sucesso: {nome_arquivo}\n")
+            
+        except ValueError:
+            self.txt_log.append("Erro: Certifique-se de digitar apenas números nos valores.\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
