@@ -273,6 +273,14 @@ class ContabilApp(QMainWindow):
         valores_str, ok3 = QInputDialog.getText(self, "Gráficos", "Valores separados por vírgula (ex: 10.5, 12.0, 15.3):")
         if not ok3 or not valores_str: return
 
+        # Cria uma janela com uma lista suspensa para escolher o formato
+        tipos = ["Absoluto (R$)", "Percentual (%)"]
+        tipo_escolhido, ok4 = QInputDialog.getItem(self, "Tipo de Gráfico", "Escolha o formato do gráfico:", tipos, 0, False)
+        if not ok4: return
+        
+        # Converte a escolha do usuário para a string que o graficos.py espera
+        tipo_grafico = 'absoluto' if "Absoluto" in tipo_escolhido else 'percentual'
+
         try:
             anos = [ano.strip() for ano in anos_str.split(',')]
             valores = [float(v.strip().replace(',', '.')) for v in valores_str.split(',')]
@@ -281,7 +289,7 @@ class ContabilApp(QMainWindow):
                 self.txt_log.append("Erro: A quantidade de anos e valores deve ser igual.\n")
                 return
 
-            gerar_grafico(indicador, anos, valores, 'absoluto')
+            gerar_grafico(indicador, anos, valores, tipo_grafico)
             
             nome_arquivo = f"grafico_{indicador.replace(' ', '_').lower()}.png"
             self.txt_log.append(f"Gráfico gerado com sucesso: {nome_arquivo}\n")
