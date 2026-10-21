@@ -51,8 +51,11 @@ class ContabilApp(QMainWindow):
         self.btn_liquidez = QPushButton("Liquidez e Cap. de Giro")
         self.btn_liquidez.clicked.connect(self.calc_liquidez)
         self.btn_endividamento = QPushButton("Endividamento")
+        self.btn_endividamento.clicked.connect(self.calc_endividamento)
         self.btn_rentabilidade = QPushButton("Rentabilidade")
+        self.btn_rentabilidade.clicked.connect(self.calc_rentabilidade)
         self.btn_graficos = QPushButton("Gerar Gráficos")
+        self.btn_graficos.clicked.connect(self.show_graphics)
 
         self.operations_layout.addWidget(self.btn_liquidez)
         self.operations_layout.addWidget(self.btn_endividamento)
@@ -116,6 +119,36 @@ class ContabilApp(QMainWindow):
         #simulação
         self.txt_log.append("Liquidez Corrente: x")
         self.txt_log.append("Capital de Giro: y\n")
+    
+    def calc_endividamento(self):
+            if not self.loaded_data:
+                self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+                return
+            
+            self.txt_log.append("Analisando a Estrutura e Endividamento...")
+    
+    
+            #simulação
+            self.txt_log.append("Estrutura e Endividamento: x\n")
+
+    def calc_rentabilidade(self):
+        if not self.loaded_data:
+                self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+                return
+            
+        self.txt_log.append("Analisando a Rentabilidade...")
+    
+        #simulação
+        self.txt_log.append("Rentabilidade: x\n")
+
+    def show_graphics(self):
+        if not self.loaded_data:
+            self.txt_log.append("AVISO: Carregue os dados primeiro antes de gerar gráficos!\n")
+            return
+        
+        self.txt_log.append("Gerando gráficos...\n")
+        #simulação
+        self.txt_log.append("Gráficos gerados com sucesso!\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
