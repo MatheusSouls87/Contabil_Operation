@@ -5,6 +5,8 @@ class ContabilApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.loaded_data = None
+
         self.setWindowTitle("Meu Sistema Contabil")
         self.resize(1200, 720)
         self.setMinimumSize(800, 600)
@@ -47,6 +49,7 @@ class ContabilApp(QMainWindow):
         self.operations_layout = QHBoxLayout()
 
         self.btn_liquidez = QPushButton("Liquidez e Cap. de Giro")
+        self.btn_liquidez.clicked.connect(self.calc_liquidez)
         self.btn_endividamento = QPushButton("Endividamento")
         self.btn_rentabilidade = QPushButton("Rentabilidade")
         self.btn_graficos = QPushButton("Gerar Gráficos")
@@ -98,9 +101,21 @@ class ContabilApp(QMainWindow):
         
         self.txt_log.append(f"A ler o ficheiro: {archive_path}")
 
-        
+        self.loaded_data = True
 
         self.txt_log.append("Dados carregados com sucesso!\nO sistema está pronto para executar as análises.\n")
+
+    def calc_liquidez(self):
+        if not self.loaded_data:
+            self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+            return
+        
+        self.txt_log.append("Analisando Liquidez e Capital de Giro...")
+
+
+        #simulação
+        self.txt_log.append("Liquidez Corrente: x")
+        self.txt_log.append("Capital de Giro: y\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
