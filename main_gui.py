@@ -31,7 +31,7 @@ class ContabilApp(QMainWindow):
         self.btn_search = QPushButton("Procurar Arquivo")
         self.btn_load = QPushButton("Carregar Dados")
 
-        self.btn_load.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
+        self.btn_load.setStyleSheet("background-color: #2E86C1; color: white; font-weight: bold;")
 
         self.archive_layout.addWidget(self.lbl_path)
         self.archive_layout.addWidget(self.btn_search)
