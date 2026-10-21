@@ -29,6 +29,8 @@ class ContabilApp(QMainWindow):
         self.lbl_path.setReadOnly(True)
 
         self.btn_search = QPushButton("Procurar Arquivo")
+        self.btn_search.clicked.connect(self.search_file)
+
         self.btn_load = QPushButton("Carregar Dados")
 
         self.btn_load.setStyleSheet("background-color: #2E86C1; color: white; font-weight: bold;")
@@ -42,6 +44,17 @@ class ContabilApp(QMainWindow):
         self.principal_layout.addWidget(self.archive_group)
 
         self.principal_layout.addStretch()
+
+    def search_file(self):
+        archive_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Selecione o arquivo",
+            "",
+            "Arquivos Excel (*.xlsx *.xls);;Todos os arquivos (*)"
+            )
+
+        if archive_path:
+            self.lbl_path.setText(archive_path)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
