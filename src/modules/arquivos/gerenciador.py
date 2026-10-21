@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-extension = ".kpw"
+extension = ".rel"
 saving_paste = "relatorios"
 
 def existing_paste():
