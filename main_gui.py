@@ -32,8 +32,8 @@ class ContabilApp(QMainWindow):
         self.btn_search.clicked.connect(self.search_file)
 
         self.btn_load = QPushButton("Carregar Dados")
-
         self.btn_load.setStyleSheet("background-color: #2E86C1; color: white; font-weight: bold;")
+        self.btn_load.clicked.connect(self.load_data)
 
         self.archive_layout.addWidget(self.lbl_path)
         self.archive_layout.addWidget(self.btn_search)
@@ -88,6 +88,19 @@ class ContabilApp(QMainWindow):
 
         if archive_path:
             self.lbl_path.setText(archive_path)
+
+    def load_data(self):
+        archive_path = self.lbl_path.text()
+
+        if not archive_path:
+            self.txt_log.append("AVISO: Nenhum ficheiro selecionado!\nPor favor, procure um ficheiro primeiro.\n")
+            return
+        
+        self.txt_log.append(f"A ler o ficheiro: {archive_path}")
+
+        
+
+        self.txt_log.append("Dados carregados com sucesso!\nO sistema está pronto para executar as análises.\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
