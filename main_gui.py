@@ -1,5 +1,5 @@
 import sys
-from qt_core import *
+from core import *
 
 class ContabilApp(QMainWindow):
     def __init__(self):
@@ -121,15 +121,15 @@ class ContabilApp(QMainWindow):
         self.txt_log.append("Capital de Giro: y\n")
     
     def calc_endividamento(self):
-            if not self.loaded_data:
-                self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
-                return
+        if not self.loaded_data:
+            self.txt_log.append("AVISO: Carregue os dados primeiro antes de calcular!\n")
+            return
             
-            self.txt_log.append("Analisando a Estrutura e Endividamento...")
+        self.txt_log.append("Analisando a Estrutura e Endividamento...")
     
     
-            #simulação
-            self.txt_log.append("Estrutura e Endividamento: x\n")
+        #simulação
+        self.txt_log.append("Estrutura e Endividamento: x\n")
 
     def calc_rentabilidade(self):
         if not self.loaded_data:
