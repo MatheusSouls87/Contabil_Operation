@@ -1,28 +1,61 @@
-# 📊 Sistema de Análise e Gráficos Contábeis
+# 📊 Sistema de Análise e Gráficos Contábeis (GUI & CLI)
 
-Este projeto é uma aplicação interativa de terminal (CLI) desenvolvida em Python. Seu objetivo principal é facilitar o cálculo de indicadores contábeis essenciais, gerar relatórios em texto e criar gráficos visuais para análise de desempenho financeiro ao longo do tempo.
+Este projeto é uma aplicação interativa desenvolvida em Python para facilitar o cálculo de indicadores contábeis essenciais, gerar relatórios de histórico e criar gráficos visuais para análise de desempenho financeiro. 
+
+O sistema conta com uma **Interface Gráfica de Usuário (GUI)** moderna e intuitiva, além de manter a versão clássica de Terminal (CLI) como alternativa.
 
 ---
 
 ## ✨ Funcionalidades
 
-O sistema é dividido em módulos interativos acessados via menu:
+O sistema é dividido em módulos operacionais integrados:
 
+* **🖥️ Interface Gráfica:** Janelas interativas, seleção de arquivos via explorador do sistema e um terminal visual integrado para acompanhar os resultados em tempo real.
 * **🧮 Cálculos de Indicadores:** 
     * **Liquidez e Capital de Giro:** Liquidez Geral, Liquidez Corrente, Capital Circulante Líquido (CCL).
     * **Lucratividade e Rentabilidade:** ROE, EBITDA, Margem EBITDA, ROIC.
     * **Estrutura e Endividamento:** Relação Capital de Terceiros / Capital Próprio, Composição do Endividamento.
-* **📝 Gerador de Relatórios:** Salva o histórico de cálculos e análises em arquivos `.txt`.
-* **📈 Gerador de Gráficos:**
-    * **Gráficos Absolutos (Barras):** Evolução de valores monetários (R$).
-    * **Gráficos Percentuais (Linhas):** Evolução de margens e taxas (%).
-    * **Gráficos Comparativos:** Plota múltiplos indicadores no mesmo gráfico (ex: comparar ROIC, ROE e Margem EBITDA ao mesmo tempo).
+* **📝 Gerador de Relatórios:** Salva e carrega o histórico de análises em arquivos (`.rel`).
+* **📈 Gerador de Gráficos:** Criação automática de gráficos em `.png` para valores absolutos (barras) ou percentuais (linhas).
+
+---
+
+## 📚 Glossário de Indicadores e Fórmulas
+
+Para garantir total transparência e rigor técnico, o motor de cálculos do sistema utiliza as fórmulas padronizadas da contabilidade financeira. Abaixo estão os indicadores processados pela aplicação:
+
+### 1. Liquidez e Capital de Giro
+Mede a capacidade da empresa de honrar seus compromissos financeiros de curto e longo prazo.
+* **Liquidez Corrente:** Indica quanto a empresa possui em bens e direitos de curto prazo para cada R$ 1,00 de dívida de curto prazo.
+  > `Fórmula: Ativo Circulante / Passivo Circulante`
+* **Liquidez Geral:** Visão de longo prazo da liquidez, incluindo direitos e obrigações com prazos maiores.
+  > `Fórmula: (Ativo Circulante + Realizável a Longo Prazo) / (Passivo Circulante + Exigível a Longo Prazo)`
+* **Capital Circulante Líquido (CCL):** Representa a folga financeira de curto prazo (em R$).
+  > `Fórmula: Ativo Circulante - Passivo Circulante`
+
+### 2. Estrutura e Endividamento
+Analisa o grau de dependência da empresa em relação a capitais externos e o perfil de suas dívidas.
+* **Relação CT/CP (Capital de Terceiros / Capital Próprio):** Indica a proporção de capital externo em relação ao capital dos sócios.
+  > `Fórmula: (Passivo Total / Patrimônio Líquido) * 100`
+* **Composição do Endividamento:** Demonstra qual porcentagem da dívida total vence no curto prazo.
+  > `Fórmula: (Passivo Circulante / Passivo Total) * 100`
+
+### 3. Lucratividade e Rentabilidade
+Mede a eficiência operacional e o retorno gerado aos acionistas sobre os investimentos realizados.
+* **Return on Equity (ROE):** Mede a rentabilidade do dinheiro investido pelos próprios acionistas.
+  > `Fórmula: (Lucro Líquido / Patrimônio Líquido) * 100`
+* **EBITDA:** Lucro antes de juros, impostos, depreciação e amortização. Reflete a geração de caixa puramente operacional.
+  > `Fórmula: Lucro Operacional + Depreciação + Amortização`
+* **Margem EBITDA:** Mostra o percentual da receita que se transformou em geração de caixa operacional.
+  > `Fórmula: (EBITDA / Receita Líquida) * 100`
+* **Return on Invested Capital (ROIC):** Mede a eficiência da empresa em alocar todo o capital à sua disposição (próprio + dívida onerosa).
+  > `Fórmula: (NOPAT / Capital Investido) * 100`
 
 ---
 
 ## 🛠️ Pré-requisitos
 
-Para rodar este projeto, você precisará ter o **Python** instalado na sua máquina (versão 3.8 ou superior recomendada). 
+Para executar este projeto, você precisará ter o **Python** instalado (versão 3.10 ou superior recomendada). 
 
 > **Aviso para usuários de Windows:** Durante a instalação do Python, certifique-se de marcar a caixa **"Add Python.exe to PATH"** na tela inicial do instalador.
 
@@ -30,10 +63,10 @@ Para rodar este projeto, você precisará ter o **Python** instalado na sua máq
 
 ## 🚀 Como Instalar e Configurar
 
-Siga o passo a passo abaixo no terminal da sua máquina (Prompt de Comando, PowerShell ou terminal do VS Code) para garantir que o código rode perfeitamente:
+Siga o passo a passo abaixo no terminal da sua máquina (Prompt de Comando, PowerShell ou Git Bash):
 
-**1. Extraia os arquivos**
-Abra a pasta do projeto no seu editor de código ou navegue até ela pelo terminal.
+**1. Extraia os arquivos e acesse a pasta**
+Navegue até a pasta do projeto utilizando o terminal.
 
 **2. Crie um Ambiente Virtual (Recomendado)**
 Isso isola as bibliotecas do projeto da sua máquina. Digite:
@@ -41,46 +74,85 @@ Isso isola as bibliotecas do projeto da sua máquina. Digite:
 python -m venv .venv
 ```
 
-**3. Ative o Ambiente no Windows**
- * No Windows:
+---
+
+### Ative o Ambiente Virtual
+
+* **No Windows (Git Bash):** 
+```bash
+source .venv/Scripts/activate
+```
+
+* **No Windows (CMD):** 
 ```bash
 .venv\Scripts\activate
 ```
- * No Mac/Linux:
+
+* **No Mac / Linux:** 
 ```bash
 source .venv/bin/activate
 ```
-(Se ativado corretamente, você verá um (.venv) verde no início da linha do terminal).
 
-**4. Instale as Dependências**
+---
 
-O sistema utiliza a biblioteca ``` matplotlib ``` 
-para desenhar os gráficos. Instale as dependências lendo o arquivo de requisitos:
+### Instale as Dependências
+
+O sistema utiliza as bibliotecas ```PySide6``` (para a interface gráfica) e ```matplotlib``` (para os gráficos). Instale tudo automaticamente executando:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-(Caso o arquivo requirements.txt não exista, você pode instalar a biblioteca manualmente digitando: ``` pip install matplotlib ```).
-
 ---
 
-# 💻 Como Usar
-Com o ambiente ativado e as dependências instaladas, basta iniciar o arquivo principal do programa:
+## 💻 Como Usar
+
+Com o ambiente ativado e as dependências instaladas, você tem duas opções para rodar o projeto:
+
+***Opção 1: Abrir com a Interface Gráfica (Recomendado)***
+
 ```bash
 python main.py
 ```
-Um menu interativo aparecerá na tela. Digite o número da opção desejada e siga as instruções.
 
- * Para inserir valores em dinheiro, utilize apenas números, usando ponto ou vírgula para os centavos (ex: 150000.50).
+Uma janela do aplicativo será aberta. Use os botões para navegar, selecione a pasta para criar/carregar relatórios e preencha os dados nas caixas de diálogo (pop-ups).
 
- * Os gráficos gerados serão salvos automaticamente na mesma pasta do projeto no formato .png.
+***Opção 2: Abrir no modo Terminal (Linha de Comando)***
+
+```bash
+python main_cli.py
+```
+
+Executa a versão operada puramente por texto direto no seu terminal.
 
 ---
 
-# 📂 Estrutura do Projeto
+## 📸 Demonstração Visual
 
- * ``` main.py ``` - Arquivo principal que gerencia o menu e o fluxo do usuário.
+Abaixo estão algumas capturas de tela demonstrando a nova interface gráfica e os resultados gerados pelo motor do sistema:
 
- * ``` src/modules/graficos.py ``` - Módulo responsável pela coleta de dados temporais e renderização dos gráficos usando matplotlib.
+**Menu Principal e Gerenciador de Arquivos**
+> *Interface principal construída com PySide6, permitindo carregar e criar relatórios facilmente.*
+![Tela Principal do Sistema](./img/main_window.png)
 
- * ``` requirements.txt ``` - "Lista de compras" contendo as bibliotecas externas necessárias para rodar o projeto.
+**Análises e Terminal Integrado**
+> *Terminal visual integrado que exibe os cálculos contábeis e registra o histórico ativo.*
+![Terminal de Resultados](./img/results_terminal.png)
+
+**Exemplo de Gráfico Gerado**
+> *Renderização automática de gráficos comparativos utilizando a biblioteca Matplotlib.*
+![Gráfico Comparativo](./img/grafico_comparativo.png)
+
+---
+
+## 📂 Estrutura do Projeto
+
+* ```main.py``` - Arquivo de execução principal que inicia a Interface Gráfica.
+
+* ```core.py``` - Contém a construção do layout, das janelas (PySide6) e a ligação visual com as funções matemáticas.
+
+* ```main_cli.py``` - Versão original do aplicativo operada exclusivamente via terminal (CLI).
+
+* ```src/modules/``` - Diretório contendo toda a inteligência do sistema (regras de negócio, fórmulas contábeis, manipulação de arquivos e geração de gráficos com matplotlib).
+
+* ```requirements.txt``` - Lista de dependências externas para execução do código.

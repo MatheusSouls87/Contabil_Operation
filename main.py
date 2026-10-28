@@ -1,392 +1,305 @@
+import sys
 import os
-from src.modules.liquidez_e_capital_de_giro.liquidez import liq_geral, liq_corrente, ccLiquido
-from src.modules.lucratividade_e_rentabilidade.rentabilidade import rEquity, eBITDA, mEBITDA, encurtedROIC, returnOiC
-from src.modules.estrutura_e_endividamento.endividamento import relacaoCTCP, comp_ENDIVIDAMENTO
-from src.modules.arquivos import gerenciador
-from src.modules import graficos
+from core import *
 
-def limpar_tela():
-    os.system('cls' if os.name == 'nt' else 'clear')
+class ContabilApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
 
-ebitda_calculado = None
-relatorio_ativo = None
+        self.loaded_data = None
 
-def ask_save(category, indicator, value):
-    global relatorio_ativo
+        self.setWindowTitle("Meu Sistema Contabil")
+        self.resize(1200, 720)
+        self.setMinimumSize(800, 600)
 
-    if relatorio_ativo is None:
-        print("\n[AVISO] Nenhum relatório ativo no momento. O valor não será guardado no histórico.")
-        return
-    
-    response = input(f"Deseja anexar este resultado ao relatório '{relatorio_ativo}' (s/n)? ").strip().lower()
-    if response in ['s', 'sim']:
-        note = input('Deseja adicionar alguma nota ou observação (deixe em branco se não quiser)? ')
-        sucess = gerenciador.add_indicator(relatorio_ativo, category, indicator, value, note)
+        self.widget_central = QWidget()
+        self.setCentralWidget(self.widget_central)
 
-        if sucess:
-            print('[✓] Indicador anexado com sucesso!')
+        self.principal_layout = QVBoxLayout(self.widget_central)
+
+        self.title_label = QLabel("Bem-vindo ao Sistema Contábil")
+        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        self.principal_layout.addWidget(self.title_label)
+
+        # --- GERENCIADOR DE ARQUIVOS ---
+        self.archive_group = QGroupBox("Gerenciador de Arquivos")
+        self.archive_layout = QHBoxLayout()
+
+        self.lbl_path = QLineEdit()
+        self.lbl_path.setPlaceholderText("Selecione o relatório (.rel)...")
+        self.lbl_path.setReadOnly(True)
+
+        # Botão para criar relatório
+        self.btn_new = QPushButton("Novo Relatório")
+        self.btn_new.setStyleSheet("background-color: #f39c12; color: white; font-weight: bold;")
+        self.btn_new.clicked.connect(self.create_new_report)
+
+        self.btn_search = QPushButton("Procurar Arquivo")
+        self.btn_search.clicked.connect(self.search_file)
+
+        self.btn_load = QPushButton("Carregar Dados")
+        self.btn_load.setStyleSheet("background-color: #2E86C1; color: white; font-weight: bold;")
+        self.btn_load.clicked.connect(self.load_data)
+
+        self.archive_layout.addWidget(self.btn_new)
+        self.archive_layout.addWidget(self.lbl_path)
+        self.archive_layout.addWidget(self.btn_search)
+        self.archive_layout.addWidget(self.btn_load)
+
+        self.archive_group.setLayout(self.archive_layout)
+        self.principal_layout.addWidget(self.archive_group)
+
+        # --- ANÁLISES E OPERAÇÕES ---
+        self.operations_group = QGroupBox("Análises e Operações")
+        self.operations_layout = QHBoxLayout()
+
+        self.btn_liquidez = QPushButton("Liquidez e Cap. de Giro")
+        self.btn_liquidez.clicked.connect(self.calc_liquidez)
+        self.btn_endividamento = QPushButton("Endividamento")
+        self.btn_endividamento.clicked.connect(self.calc_endividamento)
+        self.btn_rentabilidade = QPushButton("Rentabilidade")
+        self.btn_rentabilidade.clicked.connect(self.calc_rentabilidade)
+        self.btn_graficos = QPushButton("Gerar Gráficos")
+        self.btn_graficos.clicked.connect(self.show_graphics)
+
+        self.operations_layout.addWidget(self.btn_liquidez)
+        self.operations_layout.addWidget(self.btn_endividamento)
+        self.operations_layout.addWidget(self.btn_rentabilidade)
+        self.operations_layout.addWidget(self.btn_graficos)
+
+        self.operations_group.setLayout(self.operations_layout)
+        self.principal_layout.addWidget(self.operations_group)
+
+        # --- TERMINAL DE RESULTADOS ---
+        self.log_group = QGroupBox("Terminal de Resultados")
+        self.log_layout = QVBoxLayout()
+
+        self.txt_log = QTextEdit()
+        self.txt_log.setReadOnly(True)
+        self.txt_log.setStyleSheet("background-color: #1e1e1e; color: #00ff00; font-family: Consolas; font-size: 14px;")
+        
+        self.btn_clear = QPushButton("Limpar Terminal")
+        self.btn_clear.clicked.connect(self.txt_log.clear)
+
+        self.log_layout.addWidget(self.txt_log)
+        self.log_layout.addWidget(self.btn_clear)
+
+        self.log_group.setLayout(self.log_layout)
+        self.principal_layout.addWidget(self.log_group)
+
+        self.principal_layout.addStretch()
+
+    def create_new_report(self):
+        nome, ok1 = QInputDialog.getText(self, "Novo Relatório", "Digite o nome do relatório (ex: title_2025): ")
+        if not ok1 or not nome.strip(): return
+        
+        desc, ok2 = QInputDialog.getText(self, "Novo Relatório", "Digite uma breve descrição: ")
+        if not ok2: desc = ""
+
+        # Chama a função de criar o .rel
+        sucesso = create_new_archive(nome.strip(), desc.strip())
+
+        if sucesso:
+            self.loaded_data = nome.strip()
+            self.lbl_path.setText(f"{self.loaded_data}.rel")
+            self.txt_log.append(f"Relatório '{self.loaded_data}.rel' criado com sucesso!")
+            self.txt_log.append("Ele agora é o relatório ATIVO. Novos cálculos serão salvos nele.\n")
         else:
-            print('[X] Erro ao anexar. O relatório pode ter sido apagado ou movido.')
+            self.txt_log.append(f"Erro: Já existe um relatório chamado '{nome}'.\n")
 
-while True:
-    limpar_tela()
+    def search_file(self):
+        archive_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Selecione o relatório",
+            "",
+            "Relatórios do Sistema (*.rel);;Todos os arquivos (*)"
+        )
 
-    print("|-----------------------------------------|")
-    print("|------(INDICADORES DA KEPLER WEBER)------|")
-    print("|-----------------------------------------|\n")
+        if archive_path:
+            self.lbl_path.setText(archive_path)
 
-    print('1 - Liquidez e Capital de Giro.\n2 - Lucratividade e Rentabilidade.\n3 - Estrutura e Endividamento.\n4 - Gerenciador de Relatórios.\n5 - Gerar Gráficos.\n0 - Sair do programa.')
+    def load_data(self):
+        archive_path = self.lbl_path.text()
 
-    try:
-        userPut = int(input('Escolha o que deseja operar: '))
-    except ValueError:
-        input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
-        continue
+        if not archive_path:
+            self.txt_log.append("AVISO: Nenhum ficheiro selecionado!\nPor favor, procure um ficheiro primeiro.\n")
+            return
+        
+        nome_arquivo = os.path.basename(archive_path).replace('.rel', '')
+        conteudo = read_files(nome_arquivo)
+
+        if conteudo is not None:
+            self.txt_log.append(f"--- LENDO O RELATÓRIO: {nome_arquivo.upper()} ---")
+            self.txt_log.append(conteudo)
+            self.loaded_data = nome_arquivo 
+            self.txt_log.append(f"Relatório '{nome_arquivo}' definido como ATIVO. Novos cálculos serão salvos nele.\n")
+        else:
+            self.txt_log.append(f"Erro ao ler o relatório '{nome_arquivo}'. Ele pode não existir.\n")
+
+    def ask_save_gui(self, categoria, indicador, valor):
+        if not self.loaded_data:
+            return
+
+        resposta = QMessageBox.question(
+            self, 
+            "Salvar no Histórico", 
+            f"Deseja anexar o resultado de '{indicador}' ({valor:.2f}) ao relatório ativo '{self.loaded_data}'?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+        if resposta == QMessageBox.Yes:
+            nota, ok = QInputDialog.getText(self, "Nota Opcional", "Deseja adicionar alguma nota ou observação? (Deixe em branco se não quiser)")
+            if not ok: nota = ""
+
+            sucesso = add_indicator(self.loaded_data, categoria, indicador, valor, nota)
+
+            if sucesso:
+                self.txt_log.append(f"[Salvo] {indicador} anexado com sucesso ao relatório.\n")
+            else:
+                self.txt_log.append(f"Erro ao anexar o indicador.\n")
+
+    # ================= FUNCIONALIDADES DE CÁLCULO =================
+
+    def calc_liquidez(self):
+        
+        atvc, ok1 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Ativo Circulante (R$):", 0, 0, 1000000000, 2)
+        if not ok1: return
+        pc, ok2 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Passivo Circulante (R$):", 0, 0, 1000000000, 2)
+        if not ok2: return
+        rlp, ok3 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Realizável a Longo Prazo (R$):", 0, 0, 1000000000, 2)
+        if not ok3: return
+        elp, ok4 = QInputDialog.getDouble(self, "Entrada de Dados", "Informe o Exigível a Longo Prazo (R$):", 0, 0, 1000000000, 2)
+        if not ok4: return
+
+        self.txt_log.append("--- RESULTADOS DA LIQUIDEZ E CAPITAL DE GIRO ---")
+        
+        resultado_corrente = liq_corrente(atvc, pc)
+        resultado_geral = liq_geral(atvc, rlp, pc, elp)
+        resultado_ccl = ccLiquido(atvc, pc)
+
+        if resultado_corrente is not None:
+            self.txt_log.append(f"Liquidez Corrente: {resultado_corrente:.2f}")
+            self.ask_save_gui("Liquidez e Capital de Giro", "Liquidez Corrente", resultado_corrente)
+        else:
+            self.txt_log.append("Erro: O Passivo Circulante não pode ser zero.")
+
+        if resultado_geral is not None:
+            self.txt_log.append(f"Liquidez Geral: {resultado_geral:.2f}")
+            self.ask_save_gui("Liquidez e Capital de Giro", "Liquidez Geral", resultado_geral)
+
+        self.txt_log.append(f"Capital Circulante Líquido: R$ {resultado_ccl:.2f}")
+        self.ask_save_gui("Liquidez e Capital de Giro", "Capital Circulante Líquido", resultado_ccl)
+        
+        # AVISO GERAL SE NÃO TIVER ARQUIVO ABERTO
+        if not self.loaded_data:
+            self.txt_log.append("Resultados apenas exibidos. Crie ou carregue um relatório para salvá-los.\n")
+        else:
+            self.txt_log.append("\n")
     
-    match userPut:
-        case 1:            
-            while True:
-                limpar_tela()
-                print('1 - Calcular a Liquidez Geral.\n2 - Calcular a Liquidez Corrente.\n3 - Calcular a Capital Circulante Líquida (CCL)\n0 - Voltar ao Menu Principal.')
+    def calc_endividamento(self):
+        ct, ok1 = QInputDialog.getDouble(self, "Endividamento", "Capital de Terceiros (Passivo Total):", 0, 0, 1e9, 2)
+        if not ok1: return
+        cp, ok2 = QInputDialog.getDouble(self, "Endividamento", "Capital Próprio (Patrimônio Líquido):", 0, 0, 1e9, 2)
+        if not ok2: return
+        pc, ok3 = QInputDialog.getDouble(self, "Endividamento", "Passivo Circulante:", 0, 0, 1e9, 2)
+        if not ok3: return
+        pnc, ok4 = QInputDialog.getDouble(self, "Endividamento", "Passivo Não Circulante:", 0, 0, 1e9, 2)
+        if not ok4: return
 
-                try:
-                    option = int(input('Escolha o que deseja operar: '))
-                except ValueError:
-                    input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
-                    continue
-
-                match option:
-                    case 1:
-                        try:
-                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
-                            rlp = float(input('Informe o Realizável a Longo Prazo: R$ '))
-                            pc = float(input('Informe o Passivo Circulante: R$ '))
-                            elp = float(input('Informe o Exigível a Longo Prazo: R$ '))
-                        
-                            l_Geral = liq_geral(atvc, rlp, pc, elp)
-                            if l_Geral is not None:
-                                print(f'\nO valor da Liquidez Geral é: R$ {l_Geral:.2f}')
-
-                                ask_save("Liquidez e Capital de Giro", "Liquidez Geral", l_Geral)
-                            else:
-                                print('\nERRO! Divisão por zero. O Passivo e Exigível não podem ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 2:
-                        try:
-                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
-                            pc = float(input('Informe o Passivo Circulante: R$ '))
-
-                            l_Corrente = liq_corrente(atvc, pc)
-                            if l_Corrente is not None:
-                                print(f'\nO valor da Liquidez Corrente é: R$ {l_Corrente:.2f}')
-                                ask_save("Liquidez e Capital de Giro", "Liquidez Corrente", l_Corrente)
-                            else:
-                                print('\nERRO! Divisão por zero. O Passivo Circulante não pode ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 3:
-                        try:
-                            atvc = float(input('\nInforme o Ativo Circulante: R$ '))
-                            pc = float(input('Informe o Passivo Circulante: R$ '))
-
-                            c_Liquido = ccLiquido(atvc, pc)
-                            print(f'\nO valor da Capital Circulante Líquida é: R$ {c_Liquido:.2f}')
-                            ask_save("Liquidez e Capital de Giro", "Capital Circulante Líquido (CCL)", c_Liquido)
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 0:
-                        break
-                    case _:
-                        input('Opção inválida. Aperte [ENTER] para continuar...')
+        self.txt_log.append("--- RESULTADOS DE ESTRUTURA E ENDIVIDAMENTO ---")
         
-        case 2:
-            while True:
-                limpar_tela()
-                print("1 - Calcular o Retorno Sobre o Patrimonio Líquido (ROE).\n2 - Calcular o EBITDA.\n3 - Calcular a Margem de EBITDA.\n4 - Calcular o Retorno Sobre o Capital Investido (ROIC).\n0 - Voltar ao Menu Principal")
-                
-                try:
-                    option1 = int(input('Escolha o que deseja operar: '))
-                except ValueError:
-                    input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
-                    continue
+        r_ctcp = relacaoCTCP(ct, cp)
+        if r_ctcp is not None:
+            self.txt_log.append(f"Relação CT/CP: {r_ctcp:.2f}%")
+            self.ask_save_gui("Estrutura e Endividamento", "Relação CT/CP", r_ctcp)
+        else:
+            self.txt_log.append("Erro: Capital Próprio não pode ser zero.")
 
-                match option1:
-                    case 1:
-                        try:
-                            ll = float(input('\nInforme o Lucro Líquido: R$ '))
-                            pl = float(input('Informe o Patrimônio Líquido: R$ '))
+        comp_end = comp_ENDIVIDAMENTO(pc, pnc)
+        if comp_end is not None:
+            self.txt_log.append(f"Composição do Endividamento: {comp_end:.2f}%")
+            self.ask_save_gui("Estrutura e Endividamento", "Composição do Endividamento", comp_end)
+        else:
+            self.txt_log.append("Erro: Passivo Total não pode ser zero.")
 
-                            r_Equity = rEquity(ll, pl)
-                            if r_Equity is not None:
-                                print(f'\nO valor do ROE é: {r_Equity:.2f}%')
-                                ask_save("Lucratividade e Rentabilidade", "Return of Equity (ROE)", r_Equity)
-                            else:
-                                print('\nERRO! Divisão por zero. O Patrimônio Líquido não pode ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 2:
-                        try:
-                            l_Operacional = float(input('\nInforme o Lucro Operacional: R$ '))
-                            dp = float(input('Informe a Depreciação: R$ '))
-                            am = float(input('Informe a Amortização: R$ '))
+        if not self.loaded_data:
+            self.txt_log.append("Resultados apenas exibidos. Crie ou carregue um relatório para salvá-los.\n")
+        else:
+            self.txt_log.append("\n")
 
-                            ebitda_calculado = eBITDA(l_Operacional, dp, am)
-                            print(f'\nO valor do EBITDA é: R$ {ebitda_calculado:.2f}')
-                            ask_save("Lucratividade e Rentabilidade", "Lucro antes de Juros, Impostos, Depreciação e Amortização (EBITDA)", ebitda_calculado)
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 3:
-                        try:
-                            ebitda_atual = 0
-                            
-                            if ebitda_calculado is not None:
-                                confirmation = input(f'Deseja utilizar o EBITDA R$ {ebitda_calculado:.2f} calculado anteriormente (s/n)? ').strip().lower()
-                                if confirmation in ['s', 'sim']:
-                                    ebitda_atual = ebitda_calculado
-                                elif confirmation in ['n', 'nao', 'não']:
-                                    ebitda_atual = float(input('Digite o valor do EBITDA: R$ '))
-                                else:
-                                    input('Opção inválida. Aperte [ENTER] para continuar...')
-                                    continue
-                            else:
-                                ebitda_atual = float(input('Digite o valor do EBITDA: R$ '))
+    def calc_rentabilidade(self):
+        ll, ok1 = QInputDialog.getDouble(self, "Rentabilidade", "Lucro Líquido:", 0, -1e9, 1e9, 2)
+        if not ok1: return
+        pl, ok2 = QInputDialog.getDouble(self, "Rentabilidade", "Patrimônio Líquido:", 0, -1e9, 1e9, 2)
+        if not ok2: return
+        lop, ok3 = QInputDialog.getDouble(self, "Rentabilidade", "Lucro Operacional:", 0, -1e9, 1e9, 2)
+        if not ok3: return
+        dep, ok4 = QInputDialog.getDouble(self, "Rentabilidade", "Depreciação:", 0, 0, 1e9, 2)
+        if not ok4: return
+        amo, ok5 = QInputDialog.getDouble(self, "Rentabilidade", "Amortização:", 0, 0, 1e9, 2)
+        if not ok5: return
+        rl, ok6 = QInputDialog.getDouble(self, "Rentabilidade", "Receita Líquida:", 0, 0, 1e9, 2)
+        if not ok6: return
 
-                            receita_liquida = float(input('Informe Receita Líquida: R$ '))
-                            margem_EBITDA = mEBITDA(ebitda_atual, receita_liquida)
+        self.txt_log.append("--- RESULTADOS DE LUCRATIVIDADE E RENTABILIDADE ---")
 
-                            if margem_EBITDA is not None:
-                                print(f'A Margem EBITDA calculada é: {margem_EBITDA:.2f}%')
-                                ask_save("Lucratividade e Rentabilidade", "Margem EBITDA", margem_EBITDA)
-                            else:
-                                print('\nERRO! A Receita Líquida não pode ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                            
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                    
-                    case 4:
-                        try:
-                            check = input('Você já possui o NOPAT calculado (s/n)? ').strip().lower()
-                            if check not in ['s', 'sim', 'n', 'nao', 'não']:
-                                input('Opção inválida. Aperte [ENTER] para continuar...')
-                                continue
-                            
-                            nopat = 0
-                            if check in ['s', 'sim']:
-                                nopat = float(input('Informe o NOPAT: R$ '))
-                            else:
-                                ebitN = float(input('Informe o valor do EBIT: R$ '))
-                                isl = float(input('Informe os Impostos Sobre o Lucro: R$ '))
-                                nopat = ebitN - isl
+        roe = rEquity(ll, pl)
+        if roe is not None:
+            self.txt_log.append(f"ROE: {roe:.2f}%")
+            self.ask_save_gui("Lucratividade e Rentabilidade", "Return of Equity (ROE)", roe)
 
-                            check2 = input('Você já possui o valor calculado do Capital Investido (s/n)? ').strip().lower()
-                            if check2 not in ['s', 'sim', 'n', 'nao', 'não']:
-                                input('Opção inválida. Aperte [ENTER] para continuar...')
-                                continue
-                            
-                            roic_result = None
-                            if check2 in ['s', 'sim']:
-                                cInvestido = float(input('Informe o Capital Investido: R$ '))
-                                roic_result = encurtedROIC(nopat, cInvestido)
-                            else:
-                                pl = float(input('Informe o Patrimônio Líquido: R$ '))
-                                divBruta = float(input('Informe o Passivo Oneroso (Dívida Bruta): R$ '))
-                                caixa = float(input('Informe o valor de Caixa e Equivalente: R$ '))
-                                po = divBruta - caixa
-                                roic_result = returnOiC(nopat, pl, po)
+        ebitda_val = eBITDA(lop, dep, amo)
+        self.txt_log.append(f"EBITDA: R$ {ebitda_val:.2f}")
+        self.ask_save_gui("Lucratividade e Rentabilidade", "EBITDA", ebitda_val)
 
-                            if roic_result is not None:
-                                print(f'O valor relativo/percentual do ROIC é: {roic_result:.2f}%')
-                                ask_save("Lucratividade e Rentabilidade", "Retorno Sobre o Capítal Investido (ROIC)", roic_result)
-                            else:
-                                print('\nERRO! Divisão por zero no cálculo do ROIC.')
-                            input('Aperte [ENTER] para continuar...')
+        m_ebitda = mEBITDA(ebitda_val, rl)
+        if m_ebitda is not None:
+            self.txt_log.append(f"Margem EBITDA: {m_ebitda:.2f}%")
+            self.ask_save_gui("Lucratividade e Rentabilidade", "Margem EBITDA", m_ebitda)
 
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
+        if not self.loaded_data:
+            self.txt_log.append("Resultados apenas exibidos. Crie ou carregue um relatório para salvá-los.\n")
+        else:
+            self.txt_log.append("\n")
 
-                    case 0:
-                        break
-                    case _:
-                        input('Opção inválida. Aperte [ENTER] para continuar...')
+    def show_graphics(self):
+        indicador, ok1 = QInputDialog.getText(self, "Gráficos", "Nome do Indicador (ex: ROE):")
+        if not ok1 or not indicador: return
 
-        case 3:
-            while True:
-                limpar_tela()
-                print('1 - Calcular a Relação CT/CP (Endividamento).\n2 - Calcular a Composição do Endividamento.\n0 - Voltar ao Menu Principal.')
+        anos_str, ok2 = QInputDialog.getText(self, "Gráficos", "Anos separados por vírgula (ex: 2021, 2022, 2023):")
+        if not ok2 or not anos_str: return
 
-                try:
-                    userOption = int(input('Escolha o que deseja operar: '))
-                except ValueError:
-                    input('ERROR! Opção digite um número.\nAperte [ENTER] para continuar...')
-                    continue
-                
-                match userOption:
-                    case 1:
-                        try:
-                            ct = float(input('Digite o Capital de Terceiros (Passivo Total): R$ '))
-                            cp = float(input('Digite o Capital Próprio (Patrimônio Líquido): R$ '))
+        valores_str, ok3 = QInputDialog.getText(self, "Gráficos", "Valores separados por vírgula (ex: 10.5, 12.0, 15.3):")
+        if not ok3 or not valores_str: return
 
-                            r_CTCP = relacaoCTCP(ct, cp)
-                            if r_CTCP is not None:
-                                print(f'O valor relativo/percentual da Relação CT/CP é de {r_CTCP:.2f}%.')
-                                ask_save("Estrutura e Endividamento", "Relação CT/CP", r_CTCP)
-                            else:
-                                print('\nERRO! O Capital Próprio não pode ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                            
-                    case 2:
-                        try:
-                            pc = float(input('Digite o Passivo Circulante: R$ '))
-                            pnc = float(input('Digite o Passivo Não Circulante: R$ '))
-
-                            composicao_Endividamento = comp_ENDIVIDAMENTO(pc, pnc)
-                            if composicao_Endividamento is not None:
-                                print(f'O valor relativo/percentual da Composição do Endividamento é {composicao_Endividamento:.2f}%.')
-                                ask_save("Estrutura e Endividamento", "Composição do Endividamento", composicao_Endividamento)
-                            else:
-                                print('\nERRO! O Passivo Total não pode ser zero.')
-                            input('Aperte [ENTER] para continuar...')
-                        except ValueError:
-                            input('ERROR! Digite apenas números com "." para decimais. Aperte [ENTER]...')
-                            
-                    case 0:
-                        break
-                    case _:
-                        input('Opção inválida! Aperte [ENTER] para continuar...')
+        # Cria uma janela com uma lista suspensa para escolher o formato
+        tipos = ["Absoluto (R$)", "Percentual (%)"]
+        tipo_escolhido, ok4 = QInputDialog.getItem(self, "Tipo de Gráfico", "Escolha o formato do gráfico:", tipos, 0, False)
+        if not ok4: return
         
-        case 4:
-            while True:
-                limpar_tela()
-                print('--- GERENCIADOR DE RELATÓRIOS ---')
-                print('1 - Listar e Ler Relatórios Salvos.\n2 - Criar Novo Relatório.\n0 - Voltar ao Menu Principal.')
+        # Converte a escolha do usuário para a string que o graficos.py espera
+        tipo_grafico = 'absoluto' if "Absoluto" in tipo_escolhido else 'percentual'
 
-                try:
-                    op_archive = int(input('\nEscolha a operação: '))
-                except ValueError:
-                    input('ERROR! Digite um número. Aperte [ENTER] para continuar...')
-                    continue
+        try:
+            anos = [ano.strip() for ano in anos_str.split(',')]
+            valores = [float(v.strip().replace(',', '.')) for v in valores_str.split(',')]
 
-                match op_archive:
-                    case 1:
-                        saved_files = gerenciador.list_files()
+            if len(anos) != len(valores):
+                self.txt_log.append("Erro: A quantidade de anos e valores deve ser igual.\n")
+                return
 
-                        if len(saved_files) == 0:
-                            print('\nNenhum relatório encontrado no sistema.')
-                            input('Aperte [ENTER] para continuar...')
-                        else:
-                            print('\nRelatórios Disponíveis:')
-                            for i, arq in enumerate(saved_files):
-                                clean_name = arq.replace(gerenciador.extension, "")
-                                print(f'[{i+1}] - {clean_name}')
-                            
-                            try:
-                                choose = int(input('\nDigite o número do relatório que deseja abrir (0 para cancelar): '))
-                                if choose > 0 and choose <= len(saved_files):
-                                    archive_choose = saved_files[choose - 1]
-                                    conteudo = gerenciador.read_files(archive_choose)
+            gerar_grafico(indicador, anos, valores, tipo_grafico)
+            
+            nome_arquivo = f"grafico_{indicador.replace(' ', '_').lower()}.png"
+            self.txt_log.append(f"Gráfico gerado com sucesso: {nome_arquivo}\n")
+            
+        except ValueError:
+            self.txt_log.append("Erro: Certifique-se de digitar apenas números nos valores.\n")
 
-                                    limpar_tela()
-                                    print(conteudo)
-                                    
-                                    define = input('Deseja definir este relatório como o ativo no momento (s/n)? ').strip().lower()
-                                    if define not in ['s', 'sim', 'n', 'nao', 'não']:
-                                        input('Opção inválida. Aperte [ENTER] para continuar...')
-                                        continue
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
 
-                                    if define in ['s', 'sim']:
-                                        relatorio_ativo = archive_choose.replace(gerenciador.extension, "")
-                                        print(f"Relatório '{relatorio_ativo}' definido como ativo.")
-                                    else:
-                                        pass
+    window = ContabilApp()
+    window.show()
 
-                                    input('\nFim do relatório. Aperte [ENTER] para continuar...')
-                                elif choose != 0:
-                                    input('Número inválido. Aperte [ENTER] para continuar...')
-                            except ValueError:
-                                input('ERRO! Digite apenas o número correspondente.\nAperte [ENTER] para continuar...')
-                    
-                    case 2:
-                        limpar_tela()
-                        print("--- CRIAR NOVO RELATÓRIO ---")
-                        new_name = input('Digite o nome do projeto/relatório (ex: kepler_2025): ').strip()
-                        describe = input('Digite uma breve descrição para este relatório: ').strip()
-
-                        sucess = gerenciador.create_new_archive(new_name, describe)
-
-                        if sucess:
-                            relatorio_ativo = new_name
-                            print(f"\n[✓] Relatório '{new_name}{gerenciador.extension}' criado com sucesso!")
-                            print("Este relatório está agora ATIVO. Todos os novos cálculos podem ser guardados nele.")
-                        else:
-                            print(f"\n[X] Já existe um relatório com esse nome '{new_name}'.")
-                        
-                        input('\nAperte [ENTER] para continuar...')
-                    case 0:
-                        break
-                    case _:
-                        input('Opção inválida. Aperte [ENTER] para continuar...')
-        case 5:
-            while True:
-                limpar_tela()
-                print('===== GERAÇÃO DE GRÁFICOS =====\n')
-                print('1 - Gerar Gráficos de Valores Absolutos (R$).\n2 - Gerar Gráficos de Valores Percentuais (%).\n0 - Retornar ao Menu Principal.')
-
-                try:
-                    opc = int(input('\nEscolha uma operação: '))
-                except ValueError:
-                    input('ERRO! Digite um número. Aperte [ENTER] para continuar...')
-                    continue
-
-                match opc:
-                    case 1:
-                        indicador, anos, valores = graficos.coletar_dados_usuario('absoluto')
-                        graficos.gerar_grafico(indicador, anos, valores, 'absoluto')
-                        input('\nAperte [ENTER] para continuar...')
-                    case 2:
-                        indicador, anos, valores = graficos.coletar_dados_usuario('percentual')
-                        graficos.gerar_grafico(indicador, anos, valores, 'percentual')
-                        input('\nAperte [ENTER] para continuar...')
-                    case 3:
-                        print("\n--- Gráfico Comparativo (Múltiplas Linhas) ---")
-                        print("1 - Valores Absolutos (R$)")
-                        print("2 - Valores Percentuais (%)")
-                        
-                        while True:
-                            escolha_tipo = input("Escolha o tipo de gráfico (1 ou 2): ").strip()
-                            if escolha_tipo == '1':
-                                tipo_multiplo = 'absoluto'
-                                break
-                            elif escolha_tipo == '2':
-                                tipo_multiplo = 'percentual'
-                                break
-                            else:
-                                print("Opção inválida! Por favor, digite 1 ou 2.")
-                        
-                        anos, dados = graficos.coletar_dados_multiplos(tipo_multiplo, qtd_indicadores=3)
-                        graficos.gerar_grafico_multiplo(anos, dados, tipo_multiplo)
-                        
-                        input('\nAperte [ENTER] para continuar...')
-                    case 0:
-                        break
-                    case _:
-                        input('Opção inválida. Aperte [ENTER] para continuar...')
-
-        case 0:
-            print('Encerrando o programa...')
-            break
-        case _:
-            input('Opção inválida. Aperte [ENTER] para continuar...')
+    sys.exit(app.exec())
