@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 from core import *
 
 class ContabilApp(QMainWindow):
@@ -61,11 +62,14 @@ class ContabilApp(QMainWindow):
         self.btn_rentabilidade.clicked.connect(self.calc_rentabilidade)
         self.btn_graficos = QPushButton("Gerar Gráficos")
         self.btn_graficos.clicked.connect(self.show_graphics)
+        self.btn_graficos_comp = QPushButton("Gerar Gráfico Comparativo")
+        self.btn_graficos_comp.clicked.connect(self.show_graphics_multiplo)
 
         self.operations_layout.addWidget(self.btn_liquidez)
         self.operations_layout.addWidget(self.btn_endividamento)
         self.operations_layout.addWidget(self.btn_rentabilidade)
         self.operations_layout.addWidget(self.btn_graficos)
+        self.operations_layout.addWidget(self.btn_graficos_comp)
 
         self.operations_group.setLayout(self.operations_layout)
         self.principal_layout.addWidget(self.operations_group)
@@ -326,8 +330,6 @@ class ContabilApp(QMainWindow):
                 for valor in valores_str.split(",")
             ]
 
-            import math
-
             if any(not math.isfinite(valor) for valor in valores):
                 raise ValueError("Os valores devem ser números finitos.")
 
@@ -367,6 +369,60 @@ class ContabilApp(QMainWindow):
             self.txt_log.append(
                 f"Erro nos dados do gráfico: {erro}\n"
             )
+
+    def show_graphics_multiplo(self):
+        tipos = ["Absoluto (R$)", "Percentual (%)"]
+        tipo_escolhido, ok = QInputDialog.getItem(
+            self, "Tipo de Gráfico", "Escolha o formato do gráfico comparativo:", tipos, 0, False
+        )
+        if not ok: return
+        tipo_grafico = "absoluto" if "Absoluto" in tipo_escolhido else "percentual"
+
+        anos_str, ok = QInputDialog.getText(
+            self, "Gráficos", "Anos separados por vírgula (ex.: 2023, 2024, 2025):"
+        )
+        if not ok or not anos_str.strip(): return
+        anos = [ano.strip() for ano in anos_str.split(",")]
+
+        qtd, ok = QInputDialog.getInt(
+            self, "Indicadores", "Quantos indicadores deseja comparar?", 2, 2, 5, 1
+        )
+        if not ok: return
+
+        dados_completos = {}
+        for i in range(qtd):
+            nome, ok = QInputDialog.getText(
+                self, f"Indicador {i+1}", f"Nome do {i+1}º indicador (ex.: ROE):"
+            )
+            if not ok or not nome.strip(): return
+            nome = nome.strip()
+
+            valores_str, ok = QInputDialog.getText(
+                self, f"Valores de {nome}", f"Valores para {nome} separados por vírgula; use ponto decimal ({len(anos)} valores) - ex.: 10.5, 12.0,...:"
+            )
+            if not ok or not valores_str.strip(): return
+
+            try:
+                valores = [float(v.strip().replace(',', '.')) for v in valores_str.split(",")]
+                if len(valores) != len(anos):
+                    self.txt_log.append(f"Erro: A quantidade de valores de '{nome}' difere da quantidade de anos.\n")
+                    return
+                dados_completos[nome] = valores
+            except ValueError:
+                self.txt_log.append(f"Erro: Certifique-se de digitar apenas números nos valores de '{nome}'.\n")
+                return
+
+        sucesso = gerar_grafico_multiplo(anos, dados_completos, tipo_grafico)
+
+        if sucesso:
+            nome_arquivo = (
+                "grafico_comparativo_absoluto.png" 
+                if tipo_grafico == "absoluto" 
+                else "grafico_comparativo_percentual.png"
+            )
+            self.txt_log.append(f"Gráfico comparativo gerado com sucesso: {nome_arquivo}\n")
+        else:
+            self.txt_log.append("Erro ao gerar o gráfico comparativo. Verifique os dados inseridos.\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

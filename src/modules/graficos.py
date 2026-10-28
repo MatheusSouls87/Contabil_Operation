@@ -97,7 +97,7 @@ def _nome_arquivo_seguro(nome):
 
 
 def nome_arquivo_grafico(nome_indicador):
-    """Retorna o nome padronizado do arquivo de gráfico individual."""
+    #Retorna o nome padronizado do arquivo de gráfico individual.
     return f"grafico_{_nome_arquivo_seguro(nome_indicador)}.png"
 
 
@@ -399,7 +399,11 @@ def gerar_grafico_multiplo(anos, dados_completos, tipo_grafico):
         )
 
         fig.tight_layout()
-        nome_arquivo = "grafico_comparativo_multiplo.png"
+
+        if tipo_grafico == "absoluto":
+            nome_arquivo = "grafico_comparativo_absoluto.png"
+        else:
+            nome_arquivo = "grafico_comparativo_percentual.png"
         fig.savefig(nome_arquivo, dpi=300, bbox_inches="tight")
 
         print(f"\n[SUCESSO] Gráfico múltiplo salvo como '{nome_arquivo}'!")
