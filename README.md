@@ -141,7 +141,7 @@ Abaixo estão algumas capturas de tela demonstrando a nova interface gráfica e 
 
 **Exemplo de Gráfico Gerado**
 > *Renderização automática de gráficos comparativos utilizando a biblioteca Matplotlib.*
-![Gráfico Comparativo](./img/grafico_comparativo.png)
+![Gráfico Comparativo](./img/roe_graphic.png)
 
 ---
 

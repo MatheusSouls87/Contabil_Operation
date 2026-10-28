@@ -262,39 +262,111 @@ class ContabilApp(QMainWindow):
         else:
             self.txt_log.append("\n")
 
+    
     def show_graphics(self):
-        indicador, ok1 = QInputDialog.getText(self, "Gráficos", "Nome do Indicador (ex: ROE):")
-        if not ok1 or not indicador: return
+        indicador, ok = QInputDialog.getText(
+            self, "Gráficos", "Nome do indicador (ex.: ROE):"
+        )
+        if not ok:
+            return
 
-        anos_str, ok2 = QInputDialog.getText(self, "Gráficos", "Anos separados por vírgula (ex: 2021, 2022, 2023):")
-        if not ok2 or not anos_str: return
+        indicador = indicador.strip()
+        if not indicador:
+            self.txt_log.append("Erro: informe o nome do indicador.\n")
+            return
 
-        valores_str, ok3 = QInputDialog.getText(self, "Gráficos", "Valores separados por vírgula (ex: 10.5, 12.0, 15.3):")
-        if not ok3 or not valores_str: return
+        anos_str, ok = QInputDialog.getText(
+            self,
+            "Gráficos",
+            "Anos separados por vírgula (ex.: 2021, 2022, 2023):",
+        )
+        if not ok:
+            return
 
-        # Cria uma janela com uma lista suspensa para escolher o formato
+        valores_str, ok = QInputDialog.getText(
+            self,
+            "Gráficos",
+            "Valores separados por vírgula; use ponto decimal "
+            "(ex.: 10.5, 12.0, 15.3):",
+        )
+        if not ok:
+            return
+
         tipos = ["Absoluto (R$)", "Percentual (%)"]
-        tipo_escolhido, ok4 = QInputDialog.getItem(self, "Tipo de Gráfico", "Escolha o formato do gráfico:", tipos, 0, False)
-        if not ok4: return
-        
-        # Converte a escolha do usuário para a string que o graficos.py espera
-        tipo_grafico = 'absoluto' if "Absoluto" in tipo_escolhido else 'percentual'
+        tipo_escolhido, ok = QInputDialog.getItem(
+            self,
+            "Tipo de Gráfico",
+            "Escolha o formato do gráfico:",
+            tipos,
+            0,
+            False,
+        )
+        if not ok:
+            return
+
+        tipo_grafico = (
+            "absoluto"
+            if "Absoluto" in tipo_escolhido
+            else "percentual"
+        )
 
         try:
-            anos = [ano.strip() for ano in anos_str.split(',')]
-            valores = [float(v.strip().replace(',', '.')) for v in valores_str.split(',')]
+            anos = [ano.strip() for ano in anos_str.split(",")]
+
+            if not anos or any(not ano.isdigit() for ano in anos):
+                raise ValueError(
+                    "Informe anos inteiros separados por vírgula."
+                )
+
+            if len(set(anos)) != len(anos):
+                raise ValueError("Não repita anos no mesmo gráfico.")
+
+            valores = [
+                float(valor.strip())
+                for valor in valores_str.split(",")
+            ]
+
+            import math
+
+            if any(not math.isfinite(valor) for valor in valores):
+                raise ValueError("Os valores devem ser números finitos.")
 
             if len(anos) != len(valores):
-                self.txt_log.append("Erro: A quantidade de anos e valores deve ser igual.\n")
-                return
+                raise ValueError(
+                    "A quantidade de anos e valores deve ser igual."
+                )
 
-            gerar_grafico(indicador, anos, valores, tipo_grafico)
-            
-            nome_arquivo = f"grafico_{indicador.replace(' ', '_').lower()}.png"
-            self.txt_log.append(f"Gráfico gerado com sucesso: {nome_arquivo}\n")
-            
-        except ValueError:
-            self.txt_log.append("Erro: Certifique-se de digitar apenas números nos valores.\n")
+            if not anos or not valores:
+                raise ValueError("Informe pelo menos um ano e um valor.")
+
+            if (
+                tipo_grafico == "percentual"
+                and any(not 0 <= valor <= 100 for valor in valores)
+            ):
+                raise ValueError(
+                    "Use percentuais de 0 a 100 "
+                    "(ex.: 12.5 para 12,5%)."
+                )
+
+            sucesso = gerar_grafico(
+                indicador, anos, valores, tipo_grafico
+            )
+
+            if sucesso:
+                nome_arquivo = nome_arquivo_grafico(indicador)
+                self.txt_log.append(
+                    f"Gráfico gerado com sucesso: {nome_arquivo}\n"
+                )
+            else:
+                self.txt_log.append(
+                    "O gráfico não foi gerado. "
+                    "Confira os dados informados.\n"
+                )
+
+        except (ValueError, TypeError) as erro:
+            self.txt_log.append(
+                f"Erro nos dados do gráfico: {erro}\n"
+            )
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
