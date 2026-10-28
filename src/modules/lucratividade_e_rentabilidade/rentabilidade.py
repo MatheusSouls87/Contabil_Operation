@@ -24,3 +24,6 @@ def returnOiC(nOPAT, pLiquido, pOneroso):
         return (nOPAT / (pLiquido + pOneroso)) * 100
     except ZeroDivisionError:
         return None
+
+def calcular_nopat(lucro_operacional, aliquota_imposto):
+    return lucro_operacional * (1 - aliquota_imposto / 100)

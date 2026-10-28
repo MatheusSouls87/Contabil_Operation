@@ -245,6 +245,24 @@ class ContabilApp(QMainWindow):
         rl, ok6 = QInputDialog.getDouble(self, "Rentabilidade", "Receita Líquida:", 0, 0, 1e9, 2)
         if not ok6: return
 
+        aliquota, ok7 = QInputDialog.getDouble(
+            self,
+            "Rentabilidade",
+            "Alíquota de imposto (%):",
+            0, 0, 100, 2
+        )
+        if not ok7:
+            return
+
+        capital_investido, ok8 = QInputDialog.getDouble(
+            self,
+            "Rentabilidade",
+            "Capital Investido (R$):",
+            0, 0, 1e9, 2
+        )
+        if not ok8:
+            return
+
         self.txt_log.append("--- RESULTADOS DE LUCRATIVIDADE E RENTABILIDADE ---")
 
         roe = rEquity(ll, pl)
@@ -260,6 +278,21 @@ class ContabilApp(QMainWindow):
         if m_ebitda is not None:
             self.txt_log.append(f"Margem EBITDA: {m_ebitda:.2f}%")
             self.ask_save_gui("Lucratividade e Rentabilidade", "Margem EBITDA", m_ebitda)
+        
+        nopat = calcular_nopat(lop, aliquota)
+        roic = encurtedROIC(nopat, capital_investido)
+
+        if roic is not None:
+            self.txt_log.append(f"ROIC: {roic:.2f}%")
+            self.ask_save_gui(
+                "Lucratividade e Rentabilidade",
+                "Return on Invested Capital (ROIC)",
+                roic
+            )
+        else:
+            self.txt_log.append(
+                "Erro: O Capital Investido não pode ser zero."
+            )
 
         if not self.loaded_data:
             self.txt_log.append("Resultados apenas exibidos. Crie ou carregue um relatório para salvá-los.\n")
