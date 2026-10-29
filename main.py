@@ -30,7 +30,6 @@ class ContabilApp(QMainWindow):
         self.lbl_path.setPlaceholderText("Selecione o relatório (.rel)...")
         self.lbl_path.setReadOnly(True)
 
-        # Botão para criar relatório
         self.btn_new = QPushButton("Novo Relatório")
         self.btn_new.setStyleSheet("background-color: #f39c12; color: white; font-weight: bold;")
         self.btn_new.clicked.connect(self.create_new_report)
@@ -201,9 +200,9 @@ class ContabilApp(QMainWindow):
             self.txt_log.append("\n")
     
     def calc_endividamento(self):
-        ct, ok1 = QInputDialog.getDouble(self, "Endividamento", "Capital de Terceiros (Passivo Total):", 0, 0, 1e9, 2)
+        ct, ok1 = QInputDialog.getDouble(self, "Endividamento", "Capital de Terceiros (Passivo Circulante + Passivo Não Circulante), R$:", 0, 0, 1e9, 2)
         if not ok1: return
-        cp, ok2 = QInputDialog.getDouble(self, "Endividamento", "Capital Próprio (Patrimônio Líquido):", 0, 0, 1e9, 2)
+        cp, ok2 = QInputDialog.getDouble(self, "Endividamento", "Capital Próprio (Patrimônio Líquido), R$:", 0, 0, 1e9, 2)
         if not ok2: return
         pc, ok3 = QInputDialog.getDouble(self, "Endividamento", "Passivo Circulante:", 0, 0, 1e9, 2)
         if not ok3: return

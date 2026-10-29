@@ -23,7 +23,7 @@ def create_new_archive(archive_name, description):
     date_curr = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     with open(pathway, "w", encoding="utf-8") as f:
-        f.write(f"=== NOME DO PROJETO: {archive_name}{extension} ===\n")
+        f.write(f"=== NOME DO RELATÓRIO: {archive_name}{extension} ===\n")
         f.write(f"DESCRIÇÃO: {description}\n")
         f.write(f"CRIADO EM: {date_curr}")
         f.write(f"="*45 + "\n\n")
