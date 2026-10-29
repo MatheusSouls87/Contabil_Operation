@@ -36,7 +36,9 @@ Mede a capacidade da empresa de honrar seus compromissos financeiros de curto e 
 ### 2. Estrutura e Endividamento
 Analisa o grau de dependência da empresa em relação a capitais externos e o perfil de suas dívidas.
 * **Relação CT/CP (Capital de Terceiros / Capital Próprio):** Indica a proporção de capital externo em relação ao capital dos sócios.
-  > `Fórmula: (Passivo Total / Patrimônio Líquido) * 100`
+  > **Fórmula:** (Capital de Terceiros / Patrimônio Líquido) * 100
+
+  Onde Capital de Terceiros = Passivo Circulante + Passivo Não Circulante.
 * **Composição do Endividamento:** Demonstra qual porcentagem da dívida total vence no curto prazo.
   > `Fórmula: (Passivo Circulante / Passivo Total) * 100`
 
