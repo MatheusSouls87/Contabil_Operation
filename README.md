@@ -137,22 +137,22 @@ Abaixo estão algumas capturas de tela demonstrando a nova interface gráfica e 
 
 **Análises e Terminal Integrado**
 > *Terminal visual integrado que exibe os cálculos contábeis e registra o histórico ativo.*
-![Terminal de Resultados](./img/results_terminal.png)
+![Terminal de Resultados](./img/demonstracao_results_terminal.png)
 
 **Exemplo de Gráfico Gerado**
 > *Renderização automática de gráficos comparativos utilizando a biblioteca Matplotlib.*
-![Gráfico Comparativo](./img/grafico_comparativo_absoluto.png)
+![Gráfico Comparativo](./img/demonstracao_grafico_comparativo_absoluto.png)
 
 ---
 
 ## 📂 Estrutura do Projeto
 
-* ```main.py``` - Arquivo de execução principal que inicia a Interface Gráfica.
+- **`main.py`**: implementa a interface gráfica (GUI) com PySide6, gerencia as interações do usuário, recebe os dados e apresenta os resultados dos cálculos e gráficos.
 
-* ```core.py``` - Contém a construção do layout, das janelas (PySide6) e a ligação visual com as funções matemáticas.
+- **`main_cli.py`**: disponibiliza uma alternativa de execução pelo terminal (CLI), permitindo realizar as análises contábeis sem utilizar a interface gráfica.
 
-* ```main_cli.py``` - Versão original do aplicativo operada exclusivamente via terminal (CLI).
+- **`core.py`**: centraliza as importações das bibliotecas, componentes e funções utilizadas pela aplicação, facilitando sua integração entre os diferentes módulos.
 
-* ```src/modules/``` - Diretório contendo toda a inteligência do sistema (regras de negócio, fórmulas contábeis, manipulação de arquivos e geração de gráficos com matplotlib).
+- **`src/modules/`**: reúne os módulos responsáveis pelos cálculos dos indicadores contábeis, gerenciamento de relatórios e geração de gráficos.
 
-* ```requirements.txt``` - Lista de dependências externas para execução do código.
+* **`requirements.txt`**: Lista de dependências externas para execução do código.
