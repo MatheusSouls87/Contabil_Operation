@@ -36,19 +36,19 @@ Mede a capacidade da empresa de honrar seus compromissos financeiros de curto e 
 ### 2. Estrutura e Endividamento
 Analisa o grau de dependência da empresa em relação a capitais externos e o perfil de suas dívidas.
 * **Relação CT/CP (Capital de Terceiros / Capital Próprio):** Indica a proporção de capital externo em relação ao capital dos sócios.
-  > **Fórmula:** (Capital de Terceiros / Patrimônio Líquido) * 100
+  > `Fórmula: (Capital de Terceiros / Patrimônio Líquido) * 100`
 
   Onde Capital de Terceiros = Passivo Circulante + Passivo Não Circulante.
 * **Composição do Endividamento:** Demonstra qual porcentagem da dívida total vence no curto prazo.
-  > `Fórmula: (Passivo Circulante / Passivo Total) * 100`
+  > `Fórmula: (Passivo Circulante / (Passivo Circulante + Passivo Não Circulante)) * 100`
 
 ### 3. Lucratividade e Rentabilidade
 Mede a eficiência operacional e o retorno gerado aos acionistas sobre os investimentos realizados.
 * **Return on Equity (ROE):** Mede a rentabilidade do dinheiro investido pelos próprios acionistas.
   > `Fórmula: (Lucro Líquido / Patrimônio Líquido) * 100`
-* **EBITDA:** Lucro antes de juros, impostos, depreciação e amortização. Reflete a geração de caixa puramente operacional.
+* **EBITDA:** Indicador de desempenho operacional que representa o resultado antes de juros, impostos, depreciação e amortização.
   > `Fórmula: Lucro Operacional + Depreciação + Amortização`
-* **Margem EBITDA:** Mostra o percentual da receita que se transformou em geração de caixa operacional.
+* **Margem EBITDA:** Indica a relação percentual entre o EBITDA e a Receita Líquida, permitindo avaliar o desempenho operacional em relação às vendas.
   > `Fórmula: (EBITDA / Receita Líquida) * 100`
 * **Return on Invested Capital (ROIC):** Mede a eficiência da empresa em alocar todo o capital à sua disposição (próprio + dívida onerosa).
   > `Fórmula: (NOPAT / Capital Investido) * 100`
