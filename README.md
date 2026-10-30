@@ -158,3 +158,22 @@ Abaixo estão algumas capturas de tela demonstrando a nova interface gráfica e 
 - **`src/modules/`**: reúne os módulos responsáveis pelos cálculos dos indicadores contábeis, gerenciamento de relatórios e geração de gráficos.
 
 * **`requirements.txt`**: Lista de dependências externas para execução do código.
+
+
+---
+
+## ⚠️ Aviso importante e limitações
+
+O **Contabil_Operation** é um projeto desenvolvido com finalidade educacional, demonstrativa e de apoio à análise contábil e financeira.
+
+Os indicadores apresentados são calculados com base nos dados informados pelo usuário e nas fórmulas implementadas no sistema. Portanto, a confiabilidade dos resultados depende da qualidade, consistência e precisão das informações fornecidas.
+
+Os resultados não substituem uma análise contábil profissional, auditoria independente ou orientação de profissionais habilitados. O sistema não realiza validação automática da integridade das demonstrações contábeis utilizadas como entrada.
+
+O projeto encontra-se em desenvolvimento e poderá receber melhorias, correções e novas funcionalidades.
+
+## 📄 Direitos autorais
+
+© 2026 – Todos os direitos reservados ao autor.
+
+Este repositório é disponibilizado publicamente para fins de visualização e demonstração do projeto. A ausência de uma licença explícita não concede autorização para copiar, modificar, distribuir ou utilizar o código em outros projetos.
